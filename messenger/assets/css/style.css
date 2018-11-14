@@ -1,0 +1,647 @@
+.menu li{
+	display: inline-block;
+}
+
+.menu li:not(:first-child){
+	margin-left: -5px;
+	border-left: 1px #eeffee solid;
+}
+
+.menu li a{
+	display: block;
+	padding: 5px 20px;
+	background: #eeeeff;
+}
+
+#idialog{
+	bottom: 20px;
+	right: 20px;
+	max-width: 350px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+	border-radius: 10px;
+}
+
+#idialog,
+#idialog-close,
+#idialog-mute{
+	position: absolute;
+}
+
+#idialog #idialog-close,
+#idialog #idialog-mute{
+	top: 15px;
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+}
+
+#idialog [class^="icon-"]{
+	cursor: pointer;
+}
+
+#idialog #idialog-mute{
+	right: 50px;
+	~font-size: 20px;
+	~margin-top: -4px;
+}
+
+#idialog #idialog-close{
+	right: 15px
+}
+
+#idialog #idialog-header,
+#idialog #idialog-content{
+	~padding: 10px;
+}
+
+#idialog #idialog-header{
+	border-radius: 10px 10px 0 0;
+	text-align: center;
+	background: lightgreen;
+}
+
+#idialog #idialog-header > #idial-avatar > img{
+	border-radius: 50%;
+	width: 70px;
+}
+
+#idialog #idialog-header > #idial-name{
+	font-size: 20px;
+}
+
+#idialog #idialog-header > span{
+	font-size: 13px;
+}
+
+
+#idialog #idialog-content{
+	border-radius: 0 0 10px 10px;
+	background: #edfdff;
+}
+
+#idialog-messages{
+	height: 250px;
+	overflow: auto;
+	overflow-x: hidden;
+	padding: 0 10px;
+}
+
+#idialog-messages > div:last-child{
+	margin-bottom: 10px;
+}
+
+#idialog #idialog-static-title{
+	text-align: center;
+	font-weight: bold;
+	font-size: 12px;
+	padding: 10px;
+	background: #e2ecff;
+}
+
+.idialog-client{
+	text-align: right;
+	margin-left: 10%;
+}
+
+.idialog-advisor,
+.idialog-client{
+	~margin: 15px 0;
+	width: 90%;
+	position: relative;
+	display: flex;
+}
+
+.idialog-client > *{
+	
+	~border: 1px lime solid !important;
+}
+
+.idialog-client{
+	flex-direction: row-reverse;
+}
+
+
+.idialog-message-time{
+	font-size: 11px;
+	text-align: center;
+}
+
+.idialog-message-content{
+	padding: 5px;
+	border-radius: 10px;
+	color: black;
+	position: relative;
+	margin-top: 8px;
+	display: inline-block;
+	min-width: 50px;
+}
+
+
+
+
+.idialog-advisor > .idialog-message-content{
+	background: #f4f2ff;
+	border: 2px #ebe7ff solid;
+}
+
+.idialog-client > .idialog-message-content{
+	background: #e8ffdf;
+	border: 3px #d5ffc4 solid;
+	text-align: left;
+}
+
+
+
+.idialog-message-content:after, 
+.idialog-message-content:before{
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.idialog-advisor > .idialog-message-content:after,
+.idialog-client > .idialog-message-content:after{
+	top: 50%;
+	margin-top: -9px;
+}
+
+.idialog-advisor > .idialog-message-content:before,
+.idialog-client > .idialog-message-content:before{
+	top: 50%;
+	margin-top: -12px;
+}
+
+
+.idialog-advisor > .idialog-message-content:after,
+.idialog-advisor > .idialog-message-content:before{
+	right: 100%;
+}
+
+.idialog-client > .idialog-message-content:after,
+.idialog-client > .idialog-message-content:before{
+	left: 100%;
+}
+
+
+
+.idialog-advisor > .idialog-message-content:after{
+	border-width: 7px;
+}
+
+.idialog-advisor > .idialog-message-content:before{
+	border-width: 10px;
+	margin-left: -10px;
+}
+
+
+.idialog-client > .idialog-message-content:after{
+	border-width: 7px;
+}
+
+.idialog-client > .idialog-message-content:before{
+	border-width: 10px;
+}
+
+.idialog-advisor > .idialog-message-content:after,
+.idialog-advisor > .idialog-message-content:before{
+	border-color: transparent;
+}
+
+.idialog-client > .idialog-message-content:after,
+.idialog-client > .idialog-message-content:before{
+	border-color: transparent;
+	margin-bottom: -30px;
+}
+
+.idialog-advisor > .idialog-message-content:after{
+	border-right-color: #f4f2ff;
+}
+
+.idialog-advisor > .idialog-message-content:before{
+	border-right-color: #ebe7ff;
+}
+
+.idialog-client > .idialog-message-content:after{
+	border-left-color: #e8ffdf;
+}
+
+.idialog-client > .idialog-message-content:before{
+	border-left-color: #d5ffc4;
+}
+
+#idialog-message{
+	width: 100%;
+	padding: 5px;
+	border-radius: 15px;
+}
+
+
+#idialog-send{
+	display: inline-block;
+	font-size: 25px;
+	font-weight: bold;
+	position: relative;
+	top: 0px;
+	padding: 0 15px;
+	text-align: center;
+	cursor: pointer;
+}
+
+#idialog-send:active{
+	top: 1px;
+	left: 1px;
+}
+
+#idialog-send:before{
+	transform: scale(-1, 1) rotate(-25deg);
+}
+
+#send-block{
+	padding: 10px;
+	background: #e2ecff;
+	display: flex;
+}
+
+#idialog .icon-thumbs-down,
+#idialog .icon-thumbs-up{
+	padding: 0 5px;
+	font-size: 20px;
+}
+
+#idialog .idialog-p{
+	padding: 10px;
+}
+
+
+.center{
+	text-align: center;
+}
+
+.right{
+	text-align: right;
+}
+
+.mt10{
+	margin-top: 10px;
+}
+
+.mt20{
+	margin-top: 20px;
+}
+
+.mb10{
+	margin-bottom: 10px;
+}
+
+.mb20{
+	margin-bottom: 20px;
+}
+
+.b{
+	font-weight: bold;
+}
+
+
+@media (max-width: 320px) {
+	#idialog {
+		width: 300px;
+		bottom: 15px;
+		right: 10px;
+	}
+	
+	#idialog-messages {
+		height: 200px;
+	}
+}
+
+
+
+
+/*clients*/
+
+ul, li{
+	margin-left: 0px;
+	padding-left: 0px;
+}
+
+li{
+	list-style: none;
+}
+
+#idialog-admin{
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+	color: #4f7a80;
+	~margin-top: 50px;
+}
+
+
+#idialog-admin,
+#idialog-admin *
+{
+	~border: 2px lightgreen solid;
+}
+
+#idialog-admin #idialog-clients{
+	padding: 20px;
+	background: #f2f9ff;
+	~height: 100%;
+	overflow: auto;
+}
+
+#idialog-admin #idialog-clients li{
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	padding: 5px;
+	padding-left: 10px;
+	margin-bottom: 10px;
+	~background: #eeeeff;
+	cursor: pointer;
+}
+
+#idialog-admin #idialog-clients li *{
+	~border: 1px lime solid;
+}
+
+
+#idialog-admin .idialog-avatar{
+	background: lightgreen;
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+	font-weight: bold;
+	color: white;
+	font-size: 16px;
+	margin-right: 10px;
+	overflow: hidden;
+}
+
+#idialog-admin #idialog-clients .idialog-avatar{
+	flex-basis: 50px;
+	flex-grow: 0;
+    flex-shrink: 0;
+}
+
+#idialog-admin #idialog-clients .idialog-msg-wrapper{
+	flex-basis: 100%;
+}
+
+
+
+#idialog-messager{
+	display: flex;
+}
+
+
+
+#idialog-admin .idialog-client-name,
+#idialog-admin .idialog-lastmsg-time
+{
+	color: #4d4d4d;
+}
+
+
+#idialog-admin .idialog-client-name{
+	padding-left: 0;
+}
+
+#idialog-client-info-name{
+	margin: 10px 0;
+	font-size: 16px;
+}
+
+
+#idialog-admin .idialog-lastmsg-time{
+	padding-right: 0;
+}
+
+#idialog-admin .idialog-msg
+{
+	~color: #95a0ad;
+	padding-bottom: 20px;
+	border-bottom: 1px #ddd solid;
+}
+
+
+#idialog-admin #idialog-clients li:hover,
+#idialog-admin #idialog-clients li:active{
+	text-decoration: none;
+}
+
+#idialog-admin #idialog-client-info{
+	border-left: 1px #ddd solid;
+	~height: 100%;
+	padding-top: 20px;
+}
+
+#idialog-admin #idialog-client-info .idialog-avatar{
+	margin: 0 auto;
+	width: 70px;
+	height: 70px;
+	line-height: 70px;
+} 
+
+#idialog-admin #idialog-client-info ul li{
+	padding: 5px 0;
+}
+
+#idialog-messages-wrapper{
+	display: flex;
+    flex-direction: column;
+    padding: 0;
+    height: 100%;
+    padding-bottom: 55px;
+}
+
+#idialog-messages-wrapper > *{
+	margin-left: 20px;
+}
+
+#idialog-messages-wrapper > #idialog-exit{
+	margin: 0 15px 15px;
+}
+
+
+#idialog-client-history{
+	margin-top: 20px;
+}
+
+#idialog-client-history,
+#idialog-client-history > div{
+	position: relative;
+}
+
+#idialog-client-history > div{
+	position: absolute;
+	display: none;
+	z-index: 9999;
+	box-shadow: 0 0 3px #000;
+	top: 30px;
+}
+
+#idialog-client-history ul{
+	display: inline-block;
+	background: #fafaff;
+	~padding: 10px;
+}
+
+#idialog-client-history li:not(:last-child){
+	border-bottom: 1px green solid;
+}
+
+
+#idialog-client-history > span{
+	font-weight: bold;
+	cursor: pointer;
+	display: inlin-block;
+	margin-left: 10px;
+}
+
+#idialog-client-history ul{
+	padding: 0;
+	margin: 0;
+}
+
+#idialog-client-history ul li{
+	padding-left: 5px;
+	display: flex;
+}
+
+#idialog-client-history ul span{
+	padding: 10px 0;
+	display: inline-block;
+}
+
+#idialog-client-history ul a{
+	display: inline-block;
+	padding: 10px;
+	~min-width: 100px;
+	width: 100%;
+}
+
+#idialog-client-history > button{
+	background: transparent;
+	border: 0;
+}
+
+
+#idialog-admin #idialog-messages{
+	height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+    padding: 0 10px;
+}
+
+
+#idialog-admin #send-block{
+	margin: 0;
+	position: absolute;
+    width: 100%;
+    bottom: 0px;
+}
+
+
+
+@media (max-width: 1100px){
+	#idialog-admin{
+		~display: grid;
+		~grid-template-columns: 30% 100% 100%;
+		flex-direction: row;
+		height: auto;
+		~display: block;
+		min-width: 300px;
+		margin-top: 0;
+	}
+	
+	#mobile-nav:before{
+		display: block;
+		content: '≡';
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		background: rgba(0, 0, 0, .5);
+		padding: 2px 10px;
+		color: white;
+		font-size: 25px;
+		border-radius: 10px;
+		cursor: pointer;
+		z-index: 100;
+	}
+	
+	#idialog-admin > div:nth-child(1){
+		width: 30%;
+		float: left;
+	}
+	
+	#idialog-admin > div:nth-child(3){
+		float: left;
+		~margin-top: 20px;
+		padding-bottom: 10px;
+		border-bottom: 1px #ddd solid;
+		margin-bottom: 10px;
+		margin-top: 10px;
+		width: 100%;
+		padding-top: 0px !important;
+	}
+	
+	#idialog-admin > div:nth-child(3) > div{
+		float: left;
+		margin-right: 20px;
+	}
+	
+	#idialog-admin > div:nth-child(3) > hr{
+		display: none;
+	}
+	
+	#idialog-admin > div:nth-child(3) > ul{
+		padding: 0 10px 0 30%;
+		~padding-right: 20px;
+		margin: 0;
+		margin-left: 20px;
+	}
+	
+	#idialog-admin > div:nth-child(2){
+		order: 1;
+		min-height: 300px;
+		width: 100%;
+	}
+	
+	#idialog-admin > *{
+		~width: 100%;
+	}
+	
+	#idialog-admin > *,
+	#idialog-admin > * > *{
+		~border: 3px coral solid;
+	}
+	
+	.open{
+		left:0px !important;
+	}
+}
+
+
+@media (max-width: 1100px){
+	#idialog-admin{
+		flex-direction: column;
+	}
+		
+	#idialog-admin > div:nth-child(1){
+		width: 100%;
+		position: absolute;
+		z-index: 99;
+		left: -100%;
+		transition: .3s;
+	}
+	
+	#idialog-admin > div:nth-child(2){
+		width: 100%;
+	}
+}
