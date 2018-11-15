@@ -15,7 +15,6 @@
 			<div id="idialog-messages">
 				<div class="idialog-advisor">
 					<div class="idialog-message-content">
-						<div class="idialog-message-time">18:16</div>
 						Здравствуйте, могу ли я Вам чем-то помочь?
 					</div>
 				</div>

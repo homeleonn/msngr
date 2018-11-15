@@ -4,13 +4,11 @@ ini_set('date.timezone', 'Europe/Kiev');
 ini_set('xdebug.var_display_max_depth', 50);
 ini_set('xdebug.var_display_max_children', 256);
 ini_set('xdebug.var_display_max_data', 1024);
+ini_set('xdebug.overload_var_dump', '1');
 
-define('ROOT_URL', $_SERVER['REQUEST_SCHEME'] . '://' .$_SERVER['HTTP_HOST'] . '/test/test/');
 define('ROOT_URI', '/test/test/');
-$page = trim(str_replace([ROOT_URI, '?'.$_SERVER['QUERY_STRING']], '', $_SERVER['REQUEST_URI']), '/');
-define ('URI', $page);
-unset($page);
-//dd($_SERVER);
+define('ROOT_URL', $_SERVER['REQUEST_SCHEME'] . '://' .$_SERVER['HTTP_HOST'] . ROOT_URI);
+define('URI', trim(str_replace([ROOT_URI, '?'.$_SERVER['QUERY_STRING']], '', $_SERVER['REQUEST_URI']), '/'));
 
 function vd(){
 	$trace = debug_backtrace()[1];
@@ -25,16 +23,6 @@ function d(){
 function dd(){
 	vd(func_get_args());
 	exit;
-}
-
-
-function h($title = 'messenger'){
-	require_once 'header.php';
-	hello();
-}
-
-function f(){
-	require_once 'footer.php';
 }
 
 function getContentFromFile($file){
@@ -68,11 +56,6 @@ function uri($path = ''){
 	return ROOT_URI . ($path ? $path . '/' : '');
 }
 
-function hello(){
-	echo 'Hello from ' . $_SERVER['SCRIPT_NAME'];
-}
-
-
 function s($key = NULL, $value = NULL){
 	if (is_null($key)) {
 		return $_SESSION;
@@ -83,18 +66,6 @@ function s($key = NULL, $value = NULL){
 	}
 	
 	return $_SESSION[$key] ?? NULL;
-}
-
-function ipCollect(){
-	if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-		$ip = $_SERVER['HTTP_CLIENT_IP'];
-	} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-	} else {
-		$ip = $_SERVER['REMOTE_ADDR'];
-	}
-	
-	return $ip;
 }
 
 function arrayLast(array $array){

@@ -47,7 +47,6 @@
 		if (responce.messages) {
 			if (addMessageFlagTmp) {
 				if(responce.messages.length == 1) {
-					scrollMessageBlock('#idialog-messages');
 					storageMsg(responce.messages);
 					return true;
 				} else {
@@ -108,6 +107,7 @@
 				from: 'client'
 			};
 			showMessage(data.message, data.time, data.from);
+			scrollMessageBlock('#idialog-messages');
 			addMessageFlag = true;
 			addMessage({message: data.message});
 			$('#idialog-message').val('');

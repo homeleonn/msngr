@@ -36,6 +36,7 @@ function clearTags(text, cut = 1000){
 
 
 function scrollMessageBlock(el){
+	if (!$(el).length) return;
 	setTimeout(function(){
 		$(el).scrollTop($(el).prop('scrollHeight'));
 	}, 1);

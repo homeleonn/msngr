@@ -28,7 +28,7 @@ class Messenger
 	 */
 	public function save()
 	{
-		file_put_contents($this->filename, empty($this->clients) ? '' : serialize($this->clients));
+		file_put_contents($this->filename, empty($this->clients) ? '' : serialize($this->clients), LOCK_EX);
 	}
 	
 	public static function isAdvisor(): bool
@@ -40,11 +40,6 @@ class Messenger
 	{
 		$data = file_get_contents($this->filename);
 		return $data ? unserialize($data) : false;
-	}
-	
-	protected function setData($data)
-	{
-		file_put_contents($this->filename, serialize($data));
 	}
 	
 	/**

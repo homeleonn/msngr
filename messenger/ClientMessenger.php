@@ -34,6 +34,7 @@ class ClientMessenger extends Messenger
 		}
 		if (empty($this->client)) {
 			$this->client = $this->setInitData($referer);
+			if (!$title) $title = $_SERVER['HTTP_REFERER'];
 			$this->client['referer'] .= ', на страницу <a href="'.$_SERVER['HTTP_REFERER'].'">'.$title.'</a>';
 		}
 		
@@ -85,9 +86,9 @@ class ClientMessenger extends Messenger
 	{
 		$ip = $this->ipCollect();
 		try {
-			$geo = $this->geo($ip);
+			$geo = '---';//$this->geo($ip);
 			$geoString = "{$geo['city_name']}, {$geo['region_name']}, {$geo['country_name']}";
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			$geoString = $e->getMessage();
 		}
 		

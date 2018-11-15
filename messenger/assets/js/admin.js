@@ -55,6 +55,17 @@
 			addMessage(sendData);
 		});
 		
+		
+		
+		$stats = $('#idialog-client-info-stats');
+		if ($stats.length) {
+			minOnSite = +$stats.text().match(/(\d+) мин/)[1];
+			setInterval(function(){
+				$stats.text($stats.text().replace(/(\d+) мин/, (minOnSite += 1) + ' мин'));
+			}, 60 * 1000);
+		}
+		
+		
 		scrollMessageBlock('#idialog-messages');
 		
 		resize();
@@ -64,9 +75,12 @@
 		});
 	});
 	
+	var minOnSite, $stats;
+	
 	function resize(){
-		var wh = $(window).height();
 		var $dlgMsgWrp = $('#idialog-messages-wrapper');
+		if (!$dlgMsgWrp.length) return;
+		var wh = $(window).height();
 		$dlgMsgWrp.css('height', wh - $dlgMsgWrp.offset().top);
 	}
 
