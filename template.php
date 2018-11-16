@@ -1,3 +1,3 @@
 <?php
-echo $content;
+echo $content ?? '';
 echo getContentFromFile('messenger/templates/client.php');

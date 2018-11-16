@@ -36,6 +36,10 @@ $pages = [
 		'templateName' => 'messenger/api/client',
 		'layout' => '1'
 	],
+	
+	'test' => function(){
+		echo 'hello world';
+	},
 ];
 
 
@@ -50,6 +54,11 @@ if (!isset($pages[$page])) {
 	header("HTTP/1.0 404 Not Found");
 	exit('<h1>Page Not Found</h1>');
 } else {
-	view($pages[$page]['templateName'] ?? NULL, $pages[$page]);
+	if (is_callable($pages[$page])) {
+		$pages[$page]();
+	} else {
+		view($pages[$page]['templateName'] ?? NULL, $pages[$page]);
+	}
+	
 }
 

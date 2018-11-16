@@ -6,7 +6,7 @@ ini_set('xdebug.var_display_max_children', 256);
 ini_set('xdebug.var_display_max_data', 1024);
 ini_set('xdebug.overload_var_dump', '1');
 
-define('ROOT_URI', '/test/test/');
+define('ROOT_URI', '/test/messenger/');
 define('ROOT_URL', $_SERVER['REQUEST_SCHEME'] . '://' .$_SERVER['HTTP_HOST'] . ROOT_URI);
 define('URI', trim(str_replace([ROOT_URI, '?'.$_SERVER['QUERY_STRING']], '', $_SERVER['REQUEST_URI']), '/'));
 
