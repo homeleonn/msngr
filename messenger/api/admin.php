@@ -1,10 +1,10 @@
 <?php 
 use messenger\{AdvisorMessenger, Listener};
 
-$messenger = new AdvisorMessenger;
+$listener = new Listener(new AdvisorMessenger);
 
 if (isset($_POST['message']) && isset($_POST['client_id'])) {
-	Listener::addMessage($messenger, $_POST['message'], $_POST['client_id']);
+	$listener->addMessage($_POST['message'], $_POST['client_id']);
 }
 
-Listener::listen($messenger);
+$listener->listen();

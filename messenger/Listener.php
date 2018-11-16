@@ -4,52 +4,58 @@ namespace messenger;
 
 use function s;
 
-class Listener{
+class Listener
+{
+	private $messenger;
+	private $tokenKeys;
 	
-	private static $tokenKeys;
+	public function __construct(Messenger $messenger)
+	{
+		$this->messenger = $messenger;
+	}
 	
-	public static function generateToken()
+	public function generateToken()
 	{
 		$token =  md5(uniqid() . mt_rand(0, 9999));
-		s(self::getKey('token'), $token);
+		s($this->getKey('token'), $token);
 		return $token;
 	}
 	
-	private static function createTokenKeys($className)
+	private function createTokenKeys($className)
 	{
 		$for = stripos($className, 'client') === false ? 'admin_' : '';
-		self::$tokenKeys['token'] 		 = $for . 'token';
-		self::$tokenKeys['listen_token'] = $for . 'listen_token';
+		$this->tokenKeys['token'] 		 = $for . 'token';
+		$this->tokenKeys['listen_token'] = $for . 'listen_token';
 	}
 	
-	private static function getKey($for)
+	private function getKey($for)
 	{
-		if (!isset(self::$tokenKeys[$for])) {
+		if (!isset($this->tokenKeys[$for])) {
 			throw new \Exception("Key '{$for}' not exists.");
 		}
-		return self::$tokenKeys[$for];
+		return $this->tokenKeys[$for];
 	}
 	
 	// Идентификатор прослушивания новых сообщений(защита от ручного запуска скрипта инициализирующего прослушку, при запуске более одного скрипта прослушки, все старые скрипты завершают свою работу)
-	public static function generateListenToken()
+	public function generateListenToken()
 	{
-		$listenToken = s(self::getKey('listen_token')) ? s(self::getKey('listen_token')) + 1 : 1;
-		s(self::getKey('listen_token'), $listenToken);
+		$listenToken = s($this->getKey('listen_token')) ? s($this->getKey('listen_token')) + 1 : 1;
+		s($this->getKey('listen_token'), $listenToken);
 		return $listenToken;
 	}
 	
-	public static function checkTokensInit()
+	public function checkTokensInit()
 	{
 		$error = false;
 	
-		if 	   (is_null(s(self::getKey('token')))) 		$error = 'Token not found';
-		elseif (is_null(s(self::getKey('listen_token')))) $error = 'Listen token not found';
+		if 	   (is_null(s($this->getKey('token')))) 	   $error = 'Token not found';
+		elseif (is_null(s($this->getKey('listen_token')))) $error = 'Listen token not found';
 		
 		if ($error) {
 			self::json(['error' => $error]);
 		}
 		
-		return s(self::getKey('token'));
+		return s($this->getKey('token'));
 	}
 	
 	public static function json($data)
@@ -58,31 +64,31 @@ class Listener{
 	}
 	
 	
-	public static function listen($messenger, $timeout = 24, $step = 4)
+	public function listen($timeout = 24, $step = 4)
 	{
-		$className		= get_class($messenger);
-		self::createTokenKeys($className);
+		$className		= get_class($this->messenger);//dd($className);
+		$this->createTokenKeys($className);
 		$firstConnect 	= isset($_POST['firstConnect']);
 		$firstCircle 	= true;
 		$time 			= time();
-		$token 			= isset($_POST['firstConnect']) ? Listener::generateToken($className) : Listener::checkTokensInit();
-		$listenToken 	= Listener::generateListenToken();
+		$token 			= isset($_POST['firstConnect']) ? $this->generateToken($className) : $this->checkTokensInit();
+		$listenToken 	= $this->generateListenToken();
 
 		while (time() < $time + $timeout) {
 			if (!$firstCircle) {
-				self::wait($step);
-				$messenger = new $className;
+				$this->wait($step);
+				$this->messenger = new $className;
 			}
 			
-			self::checkTokenLoop($token, $listenToken);
+			$this->checkTokenLoop($token, $listenToken);
 			
-			$messenger->getNewMessages($firstConnect ? 0 : null, true);
+			$this->messenger->getNewMessages($firstConnect ? 0 : null, true);
 			$firstCircle = $firstConnect = false;
 		}
-		$messenger->save();
+		$this->messenger->save();
 	}
 	
-	public static function wait($sec)
+	public function wait($sec)
 	{
 		header_remove('Set-Cookie');
 		session_write_close();
@@ -90,24 +96,24 @@ class Listener{
 		session_start();
 	}
 	
-	public static function checkTokenLoop($token, $listenToken)
+	public function checkTokenLoop($token, $listenToken)
 	{
 		$checkToken = false;
-		if 	   (s(self::getKey('token')) != $token) 			 $checkToken = ['new_token' => s(self::getKey('token'))];
-		elseif (s(self::getKey('listen_token')) != $listenToken) $checkToken = ['error' => 'Lost listen token'];
+		if (s($this->getKey('token')) != $token) $checkToken = ['new_token' => s($this->getKey('token'))];
+		elseif (s($this->getKey('listen_token')) != $listenToken) $checkToken = ['error' => 'Lost listen token'];
 		
 		if ($checkToken) {
 			self::json($checkToken);
 		}
 	}
 	
-	public static function addMessage($messenger, $message, $clientId = false)
+	public function addMessage($message, $clientId = false)
 	{
 		$args = [$message];
 		if ($clientId) {
 			$args[] = $clientId;
 		}
-		call_user_func_array([$messenger, 'addMessage'], $args);
-		$messenger->getNewMessages(null, true);
+		call_user_func_array([$this->messenger, 'addMessage'], $args);
+		$this->messenger->getNewMessages(null, true);
 	}
 }
