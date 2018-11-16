@@ -6,7 +6,7 @@ ini_set('xdebug.var_display_max_children', 256);
 ini_set('xdebug.var_display_max_data', 1024);
 ini_set('xdebug.overload_var_dump', '1');
 
-define('ROOT_URI', '/test/messenger/');
+define('ROOT_URI', '/test/test/');
 define('ROOT_URL', $_SERVER['REQUEST_SCHEME'] . '://' .$_SERVER['HTTP_HOST'] . ROOT_URI);
 define('URI', trim(str_replace([ROOT_URI, '?'.$_SERVER['QUERY_STRING']], '', $_SERVER['REQUEST_URI']), '/'));
 
@@ -23,6 +23,19 @@ function d(){
 function dd(){
 	vd(func_get_args());
 	exit;
+}
+
+function tester($fn, ...$args){
+	$count = 1000;
+	$start = mt();
+	while(--$count){
+		call_user_func_array($fn, $args);
+	}
+	echo 'Test duration: ', (mt() - $start), " sec.<br>";
+}
+
+function mt($decimal = 4){
+	return number_format(microtime(true), $decimal, '.', '');
 }
 
 function getContentFromFile($file){

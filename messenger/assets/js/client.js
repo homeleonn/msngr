@@ -102,10 +102,11 @@
 			if (!message.trim()) return false;
 			var date = new Date();
 			var data = {
-				message: clearTags(message, 1000),
+				message: message,
 				time: setZero(date.getHours()) + ':' + setZero(date.getMinutes()),
 				from: 'client'
 			};
+			//showMessage(clearTags(data.message, 1000), data.time, data.from);
 			showMessage(data.message, data.time, data.from);
 			scrollMessageBlock('#idialog-messages');
 			addMessageFlag = true;

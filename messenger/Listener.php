@@ -93,7 +93,7 @@ class Listener{
 	public static function checkTokenLoop($token, $listenToken)
 	{
 		$checkToken = false;
-		if 	   (s(self::getKey('token')) != $token) 			   $checkToken = ['new_token' => s(self::getKey('token'))];
+		if 	   (s(self::getKey('token')) != $token) 			 $checkToken = ['new_token' => s(self::getKey('token'))];
 		elseif (s(self::getKey('listen_token')) != $listenToken) $checkToken = ['error' => 'Lost listen token'];
 		
 		if ($checkToken) {

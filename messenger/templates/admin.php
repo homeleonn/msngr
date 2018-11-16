@@ -11,7 +11,7 @@ if (is_null(s('admin'))) {
 	s('admin', 1);
 }
 $clients = (new messenger\AdvisorMessenger)->read();
-s('admin', microtime(true));
+s('admin', mt());
 $clientId = $_GET['client'] ?? NULL;
 
 ?>
@@ -109,4 +109,4 @@ $clientId = $_GET['client'] ?? NULL;
 <script>
 	var clientId = '<?=($clientId ?: 'undefined')?>';
 </script>
-<?php include __DIR__ . '/footer.php'; global $start; echo '<!--', microtime(true) - $start, '-->'?>
+<?php include __DIR__ . '/footer.php'; global $start; echo '<!--', mt() - $start, '-->'?>

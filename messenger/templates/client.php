@@ -3,9 +3,9 @@
 		<button id="idialog-mute" class="icon-volume-off-1"></button>
 		<div id="idialog-header" class="idialog-p">
 			<div id="idial-avatar">
-				<span class="icon-thumbs-down"></span>
+				<!--<span class="icon-thumbs-down"></span>-->
 				<img src="<?=uri()?>messenger/assets/img/avatar.jpg">
-				<span class="icon-thumbs-up"></span>
+				<!--<span class="icon-thumbs-up"></span>-->
 			</div>
 			<div id="idial-name">Ксения Юшкевич</div>
 			<span>(консультант)</span>

@@ -58,7 +58,7 @@ class ClientMessenger extends Messenger
 		$clearMessage = htmlspecialchars(substr($message, 0, 1000));
 		
 		$this->client['messages'][] = [
-			'time' => microtime(true),
+			'time' => mt(),
 			'from' => 'client',
 			'message' => $clearMessage
 		];
@@ -97,7 +97,7 @@ class ClientMessenger extends Messenger
 			'referer' 		=> $referer ? 'Переход на сайт по ссылке ' . $referer : 'Прямой вход по адресу сайта',
 			'ip' 			=> $ip,
 			'transitions' 	=> [],
-			'time' 			=> microtime(true)
+			'time' 			=> mt()
 		];
 	}
 	
@@ -131,7 +131,7 @@ class ClientMessenger extends Messenger
 	public function save(bool $saveTime = true): void
 	{
 		if ($saveTime) {
-			$this->client['time'] = microtime(true);
+			$this->client['time'] = mt();
 		}
 		parent::save();
 	}

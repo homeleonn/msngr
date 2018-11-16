@@ -5,7 +5,6 @@ define('ROOT', __DIR__ . '/');
 require_once 'autoload.php'; 
 require_once 'functions.php';
 
-
 $pages = [
 	'home' => [
 		'title' => 'Главная(messenger)',

@@ -16,7 +16,7 @@ class AdvisorMessenger extends Messenger
 		$clearMessage 	= htmlspecialchars(substr($message, 0, 2000));
 		
 		$this->clients[$clientId]['messages'][] = [
-			'time' => microtime(true),
+			'time' => mt(),
 			'from' => 'advisor',
 			'message' => $clearMessage
 		];
@@ -48,7 +48,7 @@ class AdvisorMessenger extends Messenger
 	 */
 	public function save(): void
 	{
-		s('admin', microtime(true));
+		s('admin', mt());
 		parent::save();
 	}
 	
