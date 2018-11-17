@@ -1,4 +1,9 @@
-function showMessage(message, time, from){
+function showMessage(message, ts, from){
+	let date = new Date();
+	if (ts === 0) {
+		date.setTime(ts * 1000);
+	}
+	let time = setZero(date.getHours()) + ':' + setZero(date.getMinutes())
 	$('#idialog-messages').append(`
 		<div class="idialog-` + from + `">
 			<div class="idialog-message-content">
@@ -40,6 +45,12 @@ function scrollMessageBlock(el){
 	setTimeout(function(){
 		$(el).scrollTop($(el).prop('scrollHeight'));
 	}, 1);
+}
+
+function date(ts){
+	let date = new Date();
+	date.setTime(ts * 1000);
+	return setZero(date.getHours()) + ':' + setZero(date.getMinutes());
 }
 
 

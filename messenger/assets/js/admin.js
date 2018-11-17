@@ -6,12 +6,10 @@
 		volume 		= false;
 		
 	function listenNewMessages(){
-		//if (!maxContacts--) return;
-		var data = {};
+		if (!maxContacts--) return;
+		var data = {clientId:clientId};
 		if (firstAccess) {
-			data = {
-				firstConnect: ''
-			};
+			data.firstConnect = '';
 		}
 		
 		$.post({
@@ -38,13 +36,13 @@
 			$('#idialog-clients').toggleClass('open');
 		});
 		
-		$('body').click(function(e){
-			var historyId = 'idialog-show-history'
-			var jqHistory = '#' + historyId + ' + div'
+		$('body').click(function(e){console.log(e);
+			var historyId = 'idialog-show-history';
+			
 			if(e.target.id != historyId){
-				$(jqHistory).hide();
+				$('#dlg-history-list').hide();
 			} else {
-				$(jqHistory).toggle();
+				$('#dlg-history-list').toggle();
 			}
 		});
 		
@@ -59,10 +57,10 @@
 		
 		$stats = $('#idialog-client-info-stats');
 		if ($stats.length) {
-			minOnSite = +$stats.text().match(/(\d+) мин/)[1];
-			setInterval(function(){
-				$stats.text($stats.text().replace(/(\d+) мин/, (minOnSite += 1) + ' мин'));
-			}, 60 * 1000);
+			// minOnSite = +$stats.text().match(/(\d+) мин/)[1];
+			// setInterval(function(){
+				// $stats.text($stats.text().replace(/(\d+) мин/, (minOnSite += 1) + ' мин'));
+			// }, 60 * 1000);
 		}
 		
 		
@@ -97,15 +95,24 @@
 		if (responce.token) {
 			console.log('[' + timeleft() + '] Token: ' + responce.token);
 		}
+		if (clientId) {
+			$('#idialog-messages').data('id', clientId);
+		}
+			
 		if (responce.clients) {
 			var $clientBlock, messageGlob;
 			for (client in responce.clients) {
+				var focusClient = clientId == client;
+				if (focusClient) {
+					$('#idialog-messages-wrapper, #idialog-client-info').removeClass('none');
+					getHistory(responce.clients[client].transitions);
+				}
 				if(typeof responce.clients[client].messages == "undefined") continue;
-				var focusClient = $('#idialog-messages').data('id') == client;
 				responce.clients[client].messages.forEach(function(message){
 					messageGlob = message;
-					if(focusClient)
-						showMessage(message.message, message.time, message.from);
+					if(focusClient){
+						showMessage(message.message, message.ts, message.from);
+					}
 				});	
 				$clientBlock = $('[data-id="'+client+'"]');
 				if (!$clientBlock.length) {
@@ -117,7 +124,7 @@
 					}
 					$clientBlock = $('#idialog-clients > ul > li[data-id="'+client+'"]');
 				}
-				$clientBlock.find('.idialog-lastmsg-time').text(messageGlob.time);
+				$clientBlock.find('.idialog-lastmsg-time').text(date(messageGlob.ts));
 				$clientBlock.find('.idialog-msg').text((messageGlob.from == 'advisor' ? 'я: ' : '') + messageGlob.message);
 			}
 			scrollMessageBlock('#idialog-messages');
@@ -146,5 +153,22 @@
 				</div>
 			</li>
 		`;
+	}
+	
+	function getHistory(transition){
+		console.log(transition);
+		let 
+			s 		= '',
+			count 	= transition.length
+			last	= transition[count - 1];
+		
+		transition.forEach(function(item){
+			s += `<li><span>`+(count--)+`)`+date(item.ts)+`</span> <a href="`+item.url+`">`+item.title+`</a></li>`;
+		});
+		
+		$('#dlg-client-history-caption #dlg-h-time').text(date(last.ts));
+		$('#dlg-client-history-caption > a').attr('href', last.url).text(last.title);
+		$('#dlg-client-history-caption #dlg-h-count').text(transition.length);
+		$('#idialog-client-history ul').append(s);
 	}
 })();

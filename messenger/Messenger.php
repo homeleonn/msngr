@@ -50,22 +50,24 @@ class Messenger
 	 *  
 	 *  @return list of new messages
 	 */
-	public function getMessages($client, $lastAccess): array
+	public function getMessages($client, $lastAccess, $maxMessagesCount = 10): array
 	{
 		if (!isset($client['messages'])) return [];
 		
 		$newMessages = [];
-		$countMessages = 10;
 		foreach (array_reverse($client['messages']) as $message) {
-			if ($message['time'] > $lastAccess) {
-				$message['timestamp'] 	= $message['time'];
-				$message['time'] 		= date('H:i', $message['time']);
+			if ($message['ts'] > $lastAccess) {
 				$newMessages['messages'][] = $message;
-				if(!--$countMessages) break;
+				if(!--$maxMessagesCount) break;
 			}
 		}
 		if (isset($newMessages['messages']))
 			$newMessages['messages'] = array_reverse($newMessages['messages']);
 		return $newMessages;
+	}
+	
+	public function getNewData($firstAccess)
+	{
+		return static::getNewMessages($firstAccess ? 0 : null);
 	}
 }

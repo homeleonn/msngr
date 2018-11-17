@@ -7,7 +7,7 @@
 		addMessageFlag	= false;
 		
 	function setClientData(){
-		//if (!maxContacts--) return;
+		if (!maxContacts--) return;
 		var data = {};
 		if (firstAccess) {
 			data = {
@@ -56,7 +56,7 @@
 			}
 			var sharedMsg = [];
 			responce.messages.forEach(function(message){
-				showMessage(message.message, message.time, message.from);
+				showMessage(message.message, message.ts, message.from);
 				sharedMsg.push(message);
 			});
 			if (volume) play();
@@ -100,14 +100,12 @@
 			$('#idialog-message').focus();
 			var message = $('#idialog-message').val();
 			if (!message.trim()) return false;
-			var date = new Date();
 			var data = {
 				message: message,
-				time: setZero(date.getHours()) + ':' + setZero(date.getMinutes()),
+				ts: 0,
 				from: 'client'
 			};
-			//showMessage(clearTags(data.message, 1000), data.time, data.from);
-			showMessage(data.message, data.time, data.from);
+			showMessage(data.message, data.ts, data.from);
 			scrollMessageBlock('#idialog-messages');
 			addMessageFlag = true;
 			addMessage({message: data.message});
@@ -124,7 +122,7 @@
 				var sharedMsg = localStorage.getItem('shared_msg');
 				JSON.parse(sharedMsg).forEach(function(message){
 					if (message.timestamp > lastMsgTime) {
-						showMessage(message.message, message.time, message.from);
+						showMessage(message.message, message.ts, message.from);
 					}
 				});
 				scrollMessageBlock('#idialog-messages');

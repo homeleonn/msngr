@@ -8,9 +8,6 @@ class ClientMessenger extends Messenger
 	
 	public function __construct($filename = false)
 	{
-		// if (!is_null(s('admin'))) {
-			// Listener::json(['error' => 'You are Admin']);
-		// }
 		parent::__construct($filename);
 		$clientId = $this->generateClientId($this->clients);
 		if (!isset($this->clients[$clientId])) {
@@ -40,7 +37,7 @@ class ClientMessenger extends Messenger
 		
 		if (!$this->isRefresh(end($this->client['transitions'])['url'])) {
 			$this->client['transitions'][] = [
-				'time' 	=> time(),
+				'ts' 	=> time(),
 				'url' 	=> $_SERVER['HTTP_REFERER'],
 				'title' => $title
 			];
@@ -58,32 +55,41 @@ class ClientMessenger extends Messenger
 		$clearMessage = htmlspecialchars(substr($message, 0, 1000));
 		
 		$this->client['messages'][] = [
-			'time' => mt(),
-			'from' => 'client',
-			'message' => $clearMessage
+			'ts' 		=> mt(),
+			'from' 		=> 'client',
+			'message' 	=> $clearMessage
 		];
 	}
 	
 	/**
 	 *  {@inheritdoc}
 	 */
-	public function getNewMessages($lastAccess = NULL, $save = false)
+	public function getNewMessages($lastAccess = NULL, $save = true)
 	{
 		if (!is_null($lastAccess)) {
-			$this->client['time'] = $lastAccess;
+			$this->client['last_access'] = $lastAccess;
 		}
-		$messages = parent::getMessages($this->client, $this->client['time']);
+		$messages = parent::getMessages($this->client, $this->client['last_access']);
 		
 		if (!empty($messages['messages'])) {
 			if ($save) {
 				$this->save();
 			}
-			exit(json_encode($messages));
+			return $messages;
 		}
+		
+		return false;
+	}
+	
+	public function getNewData($firstAccess)
+	{
+		$data = parent::getNewData($firstAccess);
+		return $data;
 	}
 	
 	private function setInitData($referer)
 	{
+		$mt = mt();
 		$ip = $this->ipCollect();
 		try {
 			$geo = '---';//$this->geo($ip);
@@ -97,7 +103,8 @@ class ClientMessenger extends Messenger
 			'referer' 		=> $referer ? 'Переход на сайт по ссылке ' . $referer : 'Прямой вход по адресу сайта',
 			'ip' 			=> $ip,
 			'transitions' 	=> [],
-			'time' 			=> mt()
+			'first_access' 	=> $mt,
+			'last_access' 	=> $mt
 		];
 	}
 	
@@ -131,7 +138,7 @@ class ClientMessenger extends Messenger
 	public function save(bool $saveTime = true): void
 	{
 		if ($saveTime) {
-			$this->client['time'] = mt();
+			$this->client['last_access'] = mt();
 		}
 		parent::save();
 	}

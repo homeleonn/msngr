@@ -1,3 +1,39 @@
+/*  common  */
+.center{
+	text-align: center;
+}
+
+.right{
+	text-align: right;
+}
+
+.mt10{
+	margin-top: 10px;
+}
+
+.mt20{
+	margin-top: 20px;
+}
+
+.mb10{
+	margin-bottom: 10px;
+}
+
+.mb20{
+	margin-bottom: 20px;
+}
+
+.b{
+	font-weight: bold;
+}
+
+.none{
+	display: none !important;
+}
+
+/*  endcommon  */
+
+
 .menu li{
 	display: inline-block;
 }
@@ -275,36 +311,6 @@
 	padding: 10px;
 }
 
-
-.center{
-	text-align: center;
-}
-
-.right{
-	text-align: right;
-}
-
-.mt10{
-	margin-top: 10px;
-}
-
-.mt20{
-	margin-top: 20px;
-}
-
-.mb10{
-	margin-bottom: 10px;
-}
-
-.mb20{
-	margin-bottom: 20px;
-}
-
-.b{
-	font-weight: bold;
-}
-
-
 @media (max-width: 320px) {
 	#idialog {
 		width: 300px;
@@ -424,7 +430,6 @@ li{
 
 #idialog-admin .idialog-msg
 {
-	~color: #95a0ad;
 	padding-bottom: 20px;
 	border-bottom: 1px #ddd solid;
 }
@@ -456,7 +461,6 @@ li{
 	display: flex;
     flex-direction: column;
     padding: 0;
-    height: 100%;
     padding-bottom: 55px;
 }
 

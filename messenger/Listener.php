@@ -8,10 +8,17 @@ class Listener
 {
 	private $messenger;
 	private $tokenKeys;
+	private $isFirstConnect;
 	
 	public function __construct(Messenger $messenger)
 	{
-		$this->messenger = $messenger;
+		$this->messenger 		= $messenger;
+		$this->isFirstConnect 	= isset($_POST['firstConnect']);
+	}
+	
+	public function isFirstConnect(): bool
+	{
+		return $this->isFirstConnect;
 	}
 	
 	public function generateToken()
@@ -68,10 +75,9 @@ class Listener
 	{
 		$className		= get_class($this->messenger);//dd($className);
 		$this->createTokenKeys($className);
-		$firstConnect 	= isset($_POST['firstConnect']);
 		$firstCircle 	= true;
 		$time 			= time();
-		$token 			= isset($_POST['firstConnect']) ? $this->generateToken($className) : $this->checkTokensInit();
+		$token 			= $this->isFirstConnect ? $this->generateToken($className) : $this->checkTokensInit();
 		$listenToken 	= $this->generateListenToken();
 
 		while (time() < $time + $timeout) {
@@ -82,8 +88,10 @@ class Listener
 			
 			$this->checkTokenLoop($token, $listenToken);
 			
-			$this->messenger->getNewMessages($firstConnect ? 0 : null, true);
-			$firstCircle = $firstConnect = false;
+			if ($data = $this->messenger->getNewData($this->isFirstConnect)) {
+				self::json($data);
+			}
+			$firstCircle = $this->isFirstConnect = false;
 		}
 		$this->messenger->save();
 	}
