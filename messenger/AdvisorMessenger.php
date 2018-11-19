@@ -56,27 +56,28 @@ class AdvisorMessenger extends Messenger
 		parent::save();
 	}
 	
-	public function read($firstAccess, $clientId)
+	public function read($firstAccess, $clientId = null, $needData = null)
 	{
 		if (!$this->clients) return false;
 	
 		$time 			= time();
 		$deletion 		= false;
-		$clientsOnline 	= $clientsOnlineResult = [];
-		//$n = 0;
+		$lastAccess 	= $firstAccess ? 0 : s('admin');
+		$clientsOnlineResult = [];
+		//dd($isSelectClient);
 		foreach ($this->clients as $id => $client) {
 			//$this->removeOldClient($id, &$deletion, $time);
-			$clientsOnline = [
-				'last_access' => $client['last_access']
-			];
-			$argsForMessages = [$client, $firstAccess ? 0 : s('admin')];
+			$clientsOnline = [];
+			$argsForMessages = [$client];
 			if ($clientId == $id) {
+				$argsForMessages[] = $needData ? 0 : $lastAccess;
 				$clientsOnline = array_merge(
 					$clientsOnline, 
-					$this->getHistory($id),
-					$firstAccess ? $this->getMeta($id) : []
+					$this->getHistory($id, $needData ? 0 : $lastAccess),
+					$firstAccess || $needData ? $this->getMeta($id) : []
 				);
 			} else {
+				$argsForMessages[] = $lastAccess;
 				$argsForMessages[] = 1;
 			}
 			
@@ -85,7 +86,8 @@ class AdvisorMessenger extends Messenger
 			if ($messages) {
 				$clientsOnline['messages'] = $messages['messages'];
 			}
-			$clientsOnlineResult['clients'][$id] = $clientsOnline;
+			if ($clientsOnline || $firstAccess)
+				$clientsOnlineResult['clients'][$id] = (object)$clientsOnline;
 		}
 		
 		if ($deletion) {
@@ -104,9 +106,10 @@ class AdvisorMessenger extends Messenger
 		];
 	}
 	
-	private function getHistory($clientId)
+	private function getHistory($clientId, $lastAccess)
 	{
-		return ['transitions' => array_reverse($this->clients[$clientId]['transitions'])];
+		$history = Messenger::getNewItems($this->clients[$clientId]['history'], $lastAccess);
+		return $history ? ['history' => $history] : [];
 	}
 	
 	private function removeOldClient($clientId, &$deletion, $time){
@@ -122,16 +125,17 @@ class AdvisorMessenger extends Messenger
 		// }
 	}
 	
-	public function getNewData($firstAccess)
+	public function getNewData($firstConnect)
 	{
-		$data = [];
-		$clients = $this->read($firstAccess, $_POST['clientId']);
-		if ($clients) $data = $clients;
-		$newData = parent::getNewData($firstAccess);
-		if ($newData) {
-			$data = array_merge($data, $newData);
-		}
-		return $data;
+		return $this->read($firstConnect, s('selected_client_id'), $_GET['need_data'] ?? null);
+		// $data = [];
+		// $clients = $this->read($firstConnect, $clientId, $isSelectClient);
+		// if ($clients) $data = $clients;
+		// $newData = parent::getNewData($firstConnect);
+		// if ($newData) {
+			// $data = array_merge($data, $newData);
+		// }
+		// return $data;
 	}
 	
 	public function transition()

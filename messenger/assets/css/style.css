@@ -33,6 +33,28 @@
 
 /*  endcommon  */
 
+#load{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin: -64px 0 0 -64px;
+	~background-image: url(/test/test/assets/img/preloader.gif);
+	width: 128px;
+	height: 128px;
+    border: 2px #000 solid;
+    border-radius: 50%;
+    border-right: transparent;
+    border-top: transparent;
+    transition: 10s;
+	transition-timing-function: linear;
+}
+
+#load.go{
+    transform: rotate(3600deg);
+}
+
+
+
 
 .menu li{
 	display: inline-block;
@@ -478,11 +500,11 @@ li{
 }
 
 #idialog-client-history,
-#idialog-client-history > div{
+#idialog-client-history > #dlg-history-list{
 	position: relative;
 }
 
-#idialog-client-history > div{
+#idialog-client-history > #dlg-history-list{
 	position: absolute;
 	display: none;
 	z-index: 9999;
@@ -498,14 +520,6 @@ li{
 
 #idialog-client-history li:not(:last-child){
 	border-bottom: 1px green solid;
-}
-
-
-#idialog-client-history > span{
-	font-weight: bold;
-	cursor: pointer;
-	display: inlin-block;
-	margin-left: 10px;
 }
 
 #idialog-client-history ul{
@@ -530,7 +544,7 @@ li{
 	width: 100%;
 }
 
-#idialog-client-history > button{
+#dlg-client-history-caption > button{
 	background: transparent;
 	border: 0;
 }

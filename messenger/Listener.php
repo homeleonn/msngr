@@ -13,7 +13,7 @@ class Listener
 	public function __construct(Messenger $messenger)
 	{
 		$this->messenger 		= $messenger;
-		$this->isFirstConnect 	= isset($_POST['firstConnect']);
+		$this->isFirstConnect 	= isset($_GET['first_connect']);
 	}
 	
 	public function isFirstConnect(): bool
@@ -72,7 +72,7 @@ class Listener
 	
 	
 	public function listen($timeout = 24, $step = 4)
-	{
+	{//self::json(s());
 		$className		= get_class($this->messenger);//dd($className);
 		$this->createTokenKeys($className);
 		$firstCircle 	= true;
@@ -122,6 +122,6 @@ class Listener
 			$args[] = $clientId;
 		}
 		call_user_func_array([$this->messenger, 'addMessage'], $args);
-		$this->messenger->getNewMessages(null, true);
+		self::json($this->messenger->getNewMessages(null, true));
 	}
 }

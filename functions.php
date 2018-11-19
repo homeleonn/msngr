@@ -69,6 +69,16 @@ function uri($path = ''){
 	return ROOT_URI . ($path ? $path . '/' : '');
 }
 
+function isAjax($forPost = false) {
+	if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+		if (!$forPost || $_SERVER['REQUEST_METHOD'] == 'POST') {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 function s($key = NULL, $value = NULL){
 	if (is_null($key)) {
 		return $_SESSION;

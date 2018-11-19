@@ -1,6 +1,6 @@
 ;(function(){
 	var 
-		maxContacts = 1,
+		maxContacts = 10,
 		lastMsgTime = 0,
 		firstAccess = true,
 		volume 		= false,
@@ -13,11 +13,11 @@
 			data = {
 				title		: $('title').text(),
 				referer		: document.referrer,
-				firstConnect: ''
+				first_connect: ''
 			};
 		}
 		
-		$.post({
+		$.get({
 			url: root + 'messenger/api/client/', 
 			data: data,
 			dataType: 'json'
@@ -81,15 +81,6 @@
 		if (data.message.trim()) {
 			$.post(root + 'messenger/api/client/', data, addMessageCallback, 'json');
 		}
-	}
-	
-	function play(){
-		try {
-			var promise = (new Audio(root + 'messenger/assets/audio/aay-quiet.wav')).play();
-			if (promise !== undefined) {
-			  promise.then(_ => {}).catch(error => {});
-			}
-		} catch (e) {}
 	}
 	
 

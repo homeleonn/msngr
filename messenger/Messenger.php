@@ -70,4 +70,18 @@ class Messenger
 	{
 		return static::getNewMessages($firstAccess ? 0 : null);
 	}
+	
+	public static function getNewItems($items, $lastAccess, $maxMessagesCount = -1): array
+	{
+		if (!$items) return [];
+		$newItems = [];
+		foreach (array_reverse($items) as $item) {
+			if ($item['ts'] > $lastAccess) {
+				$newItems[] = $item;
+				if($maxMessagesCount != -1 && !--$maxMessagesCount) break;
+			}
+		}
+		if ($newItems) $newItems = array_reverse($newItems);
+		return $newItems;
+	}
 }

@@ -35,8 +35,8 @@ class ClientMessenger extends Messenger
 			$this->client['referer'] .= ', на страницу <a href="'.$_SERVER['HTTP_REFERER'].'">'.$title.'</a>';
 		}
 		
-		if (!$this->isRefresh(end($this->client['transitions'])['url'])) {
-			$this->client['transitions'][] = [
+		if (!$this->isRefresh(end($this->client['history'])['url'])) {
+			$this->client['history'][] = [
 				'ts' 	=> time(),
 				'url' 	=> $_SERVER['HTTP_REFERER'],
 				'title' => $title
@@ -81,9 +81,9 @@ class ClientMessenger extends Messenger
 		return false;
 	}
 	
-	public function getNewData($firstAccess)
+	public function getNewData($firstConnect)
 	{
-		$data = parent::getNewData($firstAccess);
+		$data = parent::getNewData($firstConnect);
 		return $data;
 	}
 	
@@ -102,7 +102,7 @@ class ClientMessenger extends Messenger
 			'geo' 			=> $geoString,
 			'referer' 		=> $referer ? 'Переход на сайт по ссылке ' . $referer : 'Прямой вход по адресу сайта',
 			'ip' 			=> $ip,
-			'transitions' 	=> [],
+			'history' 	=> [],
 			'first_access' 	=> $mt,
 			'last_access' 	=> $mt
 		];

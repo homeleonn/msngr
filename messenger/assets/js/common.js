@@ -14,8 +14,22 @@ function showMessage(message, ts, from){
 	`);
 }
 
-function timeleft(){
-	var sec = performance.now() / 1000;
+function toggleLoad(){
+	$('#load').toggleClass('none');
+	setTimeout(function(){$('#load').toggleClass('go')}, 20);
+}
+
+function isset (varName, context = window) {
+	return typeof (context[varName]) != 'undefined';
+}
+
+function isUndefined (varName) {
+	return varName == undefined;
+}
+
+
+function timeleft(sec = false){
+	var sec = sec ? sec : performance.now() / 1000;
 	var h = Math.floor(sec / 3600);
 	h = setZero(h);
 	sec = sec % 3600;
@@ -67,6 +81,15 @@ function fnOnTimeout(callback, delay){
 			}, delay);
 		}
 	}
+}
+
+function play(){
+	try {
+		var promise = (new Audio(root + 'messenger/assets/audio/aay-quiet.wav')).play();
+		if (promise !== undefined) {
+		  promise.then(_ => {}).catch(error => {});
+		}
+	} catch (e) {}
 }
 
 $(function(){

@@ -1,6 +1,17 @@
 <?php
+use messenger\{AdvisorMessenger, Listener};
+// save selected client id
+s('selected_client_id', $_GET['client_id'] ?? false);
+if (isAjax()) {
+	if (!isset($_GET['client_id'])) exit;
+	if ($responce = (new AdvisorMessenger)->getNewData(false)) {
+		Listener::json($responce);
+	}
+	exit;
+}
 include __DIR__ . '/header.php';
 ?>
+<div id="load" class="none"></div>
 <span id="mobile-nav"></span>
 <div id="idialog-admin">
 	<div id="idialog-clients" class="col-sm-3">
@@ -11,7 +22,7 @@ include __DIR__ . '/header.php';
 		<div id="idialog-client-history">
 			<span id="dlg-client-history-caption">
 				<span id="dlg-h-time"></span>
-				<a href="#"></a> 
+				<a href="#" target="_blank"></a> 
 				<span id="dlg-h-count"></span>
 				<button id="idialog-show-history" class="b">&#8744;</button>
 			</span>
@@ -54,7 +65,7 @@ include __DIR__ . '/header.php';
 	</div>
 </div>
 <script>
-	var clientId = <?=($_GET['client'] ?? 'false')?>;
+	var clientId = <?=($_GET['client_id'] ?? 'false')?>;
 </script>
 <?php 
 include __DIR__ . '/footer.php'; 
