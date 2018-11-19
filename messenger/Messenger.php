@@ -66,7 +66,7 @@ class Messenger
 		return $newMessages;
 	}
 	
-	public function getNewData($firstAccess)
+	public function getNewData(bool $firstAccess)
 	{
 		return static::getNewMessages($firstAccess ? 0 : null);
 	}

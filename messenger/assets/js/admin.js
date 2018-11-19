@@ -57,7 +57,12 @@
 	
 	function listenNewMessages(){
 		if (!maxContacts--) return;
-		let data = {client_id:clientId};
+		let data = {};
+		
+		if (clientId) {
+			data.client_id = clientId;
+		}
+			
 		if (firstAccess) {
 			data.first_connect = '';
 		}
@@ -155,6 +160,8 @@
 				if (!isUndefined(clients[client.id][prop])) {
 					if (Array.isArray(client[prop])) {
 						clients[client.id][prop] = clients[client.id][prop].concat(client[prop]);
+					} else if(clients[client.id][prop] != client[prop]) {
+						clients[client.id][prop] = client[prop];
 					}
 				} else {
 					clients[client.id][prop] = client[prop];
@@ -242,6 +249,7 @@
 	}
 	
 	function setClientInfo(client){
+		if(!isset('history', client)) return; 
 		let 
 			date 		= new Date(),
 			minOnSite 	= Math.floor((date.getTime() / 1000 - client.history[0].ts) / 60);
@@ -293,7 +301,8 @@
 			window.clientId = clientId;
 			
 			if (isUndefined(clients[clientId]['geo'])) {
-				data.need_data = needData = '+';
+				data.need_data = '';
+				needData = true;
 			} else {
 				needData = false;
 			}

@@ -56,38 +56,55 @@ class AdvisorMessenger extends Messenger
 		parent::save();
 	}
 	
-	public function read($firstAccess, $clientId = null, $needData = null)
+	/**
+	 *  Read new clients data
+	 *  
+	 *  @param $firstAccess		very first request(open|refresh page)
+	 *  @param $clientId		
+	 *  @param $needData 		true if we don't know init data about client
+	 *  @param $lastCircle 		last request in pending cycle
+	 *  
+	 *  @return list clients with new data
+	 */
+	public function read(bool $firstAccess, ?int $clientId = null, bool $needData = false, bool $lastCircle = false,   $initTime = false): array
 	{
 		if (!$this->clients) return false;
 	
 		$time 			= time();
 		$deletion 		= false;
-		$lastAccess 	= $firstAccess ? 0 : s('admin');
+		$forced 		= $firstAccess || $needData;
+		$lastAccess 	= $forced ? 0 : s('admin');
 		$clientsOnlineResult = [];
-		//dd($isSelectClient);
+		//d(12);
 		foreach ($this->clients as $id => $client) {
-			//$this->removeOldClient($id, &$deletion, $time);
-			$clientsOnline = [];
-			$argsForMessages = [$client];
-			if ($clientId == $id) {
-				$argsForMessages[] = $needData ? 0 : $lastAccess;
+			// if ($this->removeOldClient($id, &$deletion, $time)) continue;
+			$clientsOnline 		= [];
+			$selectedClient 	= $clientId == $id;
+			$argsForMessages 	= [$client, $lastAccess];
+			if ($selectedClient) {
 				$clientsOnline = array_merge(
 					$clientsOnline, 
-					$this->getHistory($id, $needData ? 0 : $lastAccess),
-					$firstAccess || $needData ? $this->getMeta($id) : []
+					$forced ? $this->getMeta($id) : []
 				);
 			} else {
-				$argsForMessages[] = $lastAccess;
 				$argsForMessages[] = 1;
 			}
-			
 			
 			$messages = call_user_func_array(['parent', 'getMessages'], $argsForMessages);
 			if ($messages) {
 				$clientsOnline['messages'] = $messages['messages'];
 			}
-			if ($clientsOnline || $firstAccess)
+			//d($initTime);
+			if ($clientsOnline || $forced || ($lastCircle && $selectedClient)) {
+				if ($history = $this->getHistory($id, $initTime && $initTime < $lastAccess ? $initTime : $lastAccess)) {
+					$clientsOnline['history'] = $history;
+				}
+			}
+			
+			if ($clientsOnline || $forced) {
 				$clientsOnlineResult['clients'][$id] = (object)$clientsOnline;
+			}
+				
 		}
 		
 		if ($deletion) {
@@ -109,33 +126,25 @@ class AdvisorMessenger extends Messenger
 	private function getHistory($clientId, $lastAccess)
 	{
 		$history = Messenger::getNewItems($this->clients[$clientId]['history'], $lastAccess);
-		return $history ? ['history' => $history] : [];
+		return $history ?: [];
 	}
 	
 	private function removeOldClient($clientId, &$deletion, $time){
 		// Don't show clients which last connect 120 seconds ago or more
-		// if ($this->clients[$clientId]['last_access'] < time() - 120) {
+		if ($this->clients[$clientId]['last_access'] < $time - 120) {
 			// Remove clients which last connect 10 minutes ago or more
-			// if ($this->clients[$clientId]['last_access'] < time() - 600) {
-				// unset($this->clients[$clientId]);
-				// $deletion = true;
-			// }
-		// } else {
-			// $clientsOnline[$clientId] = $client;
-		// }
+			if ($this->clients[$clientId]['last_access'] < $time - 600) {
+				unset($this->clients[$clientId]);
+				$deletion = true;
+			}
+			return true;
+		}
+		return false;
 	}
 	
-	public function getNewData($firstConnect)
+	public function getNewData(bool $firstConnect, bool $lastCircle = false, $initTime = false): array
 	{
-		return $this->read($firstConnect, s('selected_client_id'), $_GET['need_data'] ?? null);
-		// $data = [];
-		// $clients = $this->read($firstConnect, $clientId, $isSelectClient);
-		// if ($clients) $data = $clients;
-		// $newData = parent::getNewData($firstConnect);
-		// if ($newData) {
-			// $data = array_merge($data, $newData);
-		// }
-		// return $data;
+		return $this->read($firstConnect, s('selected_client_id'), isset($_GET['need_data']), $lastCircle, $initTime);
 	}
 	
 	public function transition()

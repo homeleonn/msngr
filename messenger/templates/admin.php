@@ -1,10 +1,11 @@
 <?php
 use messenger\{AdvisorMessenger, Listener};
 // save selected client id
-s('selected_client_id', $_GET['client_id'] ?? false);
+s('selected_client_id', $_GET['client_id'] ?? null);
 if (isAjax()) {
 	if (!isset($_GET['client_id'])) exit;
 	if ($responce = (new AdvisorMessenger)->getNewData(false)) {
+		s('admin', mt());
 		Listener::json($responce);
 	}
 	exit;

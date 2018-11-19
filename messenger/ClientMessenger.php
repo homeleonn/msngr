@@ -27,7 +27,7 @@ class ClientMessenger extends Messenger
 	{
 		$params = ['title', 'referer'];
 		foreach ($params as $param) {
-			$$param = $_POST[$param] ?? null;
+			$$param = $_GET[$param] ?? null;
 		}
 		if (empty($this->client)) {
 			$this->client = $this->setInitData($referer);
@@ -66,7 +66,7 @@ class ClientMessenger extends Messenger
 	 */
 	public function getNewMessages($lastAccess = NULL, $save = true)
 	{
-		if (!is_null($lastAccess)) {
+		if (is_numeric($lastAccess)) {
 			$this->client['last_access'] = $lastAccess;
 		}
 		$messages = parent::getMessages($this->client, $this->client['last_access']);
@@ -93,7 +93,7 @@ class ClientMessenger extends Messenger
 		$ip = $this->ipCollect();
 		try {
 			$geo = '---';//$this->geo($ip);
-			$geoString = "{$geo['city_name']}, {$geo['region_name']}, {$geo['country_name']}";
+			$geoString = is_array($geo) ? "{$geo['city_name']}, {$geo['region_name']}, {$geo['country_name']}" : '';
 		} catch (\Exception $e) {
 			$geoString = $e->getMessage();
 		}
