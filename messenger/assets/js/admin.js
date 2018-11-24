@@ -1,176 +1,117 @@
-;(function(){
-	let 
-		maxContacts 	= 10,
-		lastMsgTime 	= 0,
-		firstAccess 	= true,
-		volume 			= false,
-		durationTimer 	= false,
-		needData		= false;
-		titleToggleTimer= false,
-		transition		= false,
-		window['clients'] 	= {};
+class Advisor extends Messenger
+{
+	constructor()
+	{
+		super('admin');
 		
+		this.listenTimeout		= 2000;
+		this.durationTimer 		= false,
+		this.needData			= false,
+		this.titleToggleTimer	= false,
+		this.transition			= false,
+		this.clients 			= {};
+	}
 	
-	$(function(){
-		listenNewMessages();
-		// $('#idialog-clients').on('click', 'li', function(){
-			// document.location.href = "?client=" + $(this).data('id');
-		// });
-		
-		$('#mobile-nav').click(function(){
-			$('#idialog-clients').toggleClass('open');
-		});
-		
-		$('body').click(function(e){
-			var historyId = 'idialog-show-history';
-			
-			if(e.target.id != historyId){
-				$('#dlg-history-list').hide();
-			} else {
-				$('#dlg-history-list').toggle();
-			}
-		});
-		
-		let docFocusAction = fnOnTimeout(function(){
-			if (titleToggleTimer) {
-				clearInterval(titleToggleTimer);
-				titleToggleTimer = false;
-			}
-		});
-		$(document).on('click hover mousemove focus', docFocusAction);
-		
-		$('#idialog-send').click(function(){
-			$('#idialog-message').focus();
-			var sendData = {message: $('#idialog-message').val()};
-			if (clientId) sendData.client_id = clientId;
-			addMessage(sendData);
-		});
-		
-		scrollMessageBlock('#idialog-messages');
-		
-		resize();
-		var resizeListen = fnOnTimeout(resize, 300);
-		$(window).resize(function(){
-			resizeListen();
-		});
-	});
-	
-	function listenNewMessages(){
-		if (!maxContacts--) return;
+	generateListenData()
+	{
 		let data = {};
 		
-		if (clientId) {
-			data.client_id = clientId;
-		}
-			
-		if (firstAccess) {
+		if (this.firstAccess) {
 			data.first_connect = '';
 		}
 		
-		$.get({
-			url: root + 'messenger/api/admin/', 
-			data: data,
-			dataType: 'json'
-		}).always(function(responce){
-			if (addMessageCallback(responce)) {
-				setTimeout(function(){
-					firstAccess = false;
-					listenNewMessages();
-				}, 2000);
-			}
-		});
+		if (this.clientId) {
+			data.client_id = clientId;
+		}
+		
+		return data;
 	}
 	
-	function resize(){
-		var $dlgMsgWrp = $('#idialog-messages-wrapper');
-		if (!$dlgMsgWrp.length) return;
-		var wh = $(window).height();
-		$dlgMsgWrp.css('height', wh - $dlgMsgWrp.offset().top);
-	}
-
-
-	function addMessageCallback(responce){
-		if (!handleResponce(responce)) return false;
+	listenCallback(responce){
+		if (!this.handleResponce(responce)) return false;
 			
 		if (responce.clients) {//console.log(clients);
 			for (let client in responce.clients) {
 				let 
-					selectedClient 	= clientId == client,
+					selectedClient 	= window.clientId == client,
 					clnt 			= responce.clients[client];
 				
 				clnt.id = client;
 				//console.log(clnt);
-				updateClient(clnt, selectedClient);
+				this.updateClient(clnt, selectedClient);
 				
 				if (selectedClient) {
-					handleClient(clientId);
+					this.handleClient(window.clientId);
 				}
 			}
 			//console.log(clients);
-		} else if (transition){
-			handleClient(clientId);
+		} else if (this.transition){
+			this.handleClient(window.clientId);
 		}
 		return true;
 	}
 	
-	function handleClient(clientId){
-		setSelectedClientInfo(clients[clientId]);
-		if(isset('messages', clients[clientId])) {
-			showMessages(clients[clientId].messages);
+	send()
+	{
+		$('#idialog-message').focus();
+		let sendData = {message: $('#idialog-message').val()};
+		
+		if (clientId) {
+			sendData.client_id = clientId;
+		}
+		
+		this.addMessage(sendData);
+	}
+	
+	
+
+	handleClient(clientId){
+		this.setSelectedClientInfo(this.clients[clientId]);
+		if(isset('messages', this.clients[clientId])) {
+			this.showMessages(this.clients[clientId].messages);
 		}
 	}
 	
-	function showMessages(messages){
-		messages.forEach(function(message){
-			showMessage(message.message, message.ts, message.from);
+	showMessages(messages){
+		messages.forEach((message) => {
+			this.showMessage(message.message, message.ts, message.from);
 		});
 		scrollMessageBlock('#idialog-messages');
 		
-		if (!firstAccess && messages[messages.length - 1].from == 'client') {
+		if (!this.firstAccess && messages[messages.length - 1].from == 'client') {
 			if (!document.hasFocus()) {
-				play();
+				this.play();
 				//titleToggle();
 			}
 		}
 	}
 	
-	// function titleToggle(){
-		// let 
-			// title = $('title').text();
-			// flag = false;
-		// titleToggleTimer = setInterval(function(){
-			// $('title').text(flag  ? title : '*** Новое сообщение');
-			// flag = !flag;
-		// }, 2000);
-	// }
-	
-	
-	function updateClient(client, selectedClient){
+	updateClient(client, selectedClient){
 		let 
 			dialog_clients 	= '#idialog-clients',
 			$clientBlock 	= $('#idialog-clients [data-id="'+client.id+'"]'),
-			newClient 		= isUndefined(clients[client.id]),
+			newClient 		= isUndefined(this.clients[client.id]),
 			lastMSg;
 		
-		if (newClient || (selectedClient && needData)) {
-			clients[client.id] = client;
+		if (newClient || (selectedClient && this.needData)) {
+			this.clients[client.id] = client;
 		} else {
 			for (let prop in client) {
 				//console.log(prop, client[prop], Array.isArray(client[prop]));
-				if (!isUndefined(clients[client.id][prop])) {
+				if (!isUndefined(this.clients[client.id][prop])) {
 					if (Array.isArray(client[prop])) {
-						clients[client.id][prop] = clients[client.id][prop].concat(client[prop]);
-					} else if(clients[client.id][prop] != client[prop]) {
-						clients[client.id][prop] = client[prop];
+						this.clients[client.id][prop] = this.clients[client.id][prop].concat(client[prop]);
+					} else if (this.clients[client.id][prop] != client[prop]) {
+						this.clients[client.id][prop] = client[prop];
 					}
 				} else {
-					clients[client.id][prop] = client[prop];
+					this.clients[client.id][prop] = client[prop];
 				}
 			}
 		}
 		
 		if (newClient) {
-			let newClientItem = getNewClientItem(client.id);
+			let newClientItem = this.getNewClientItem(client.id);
 			let append = $(dialog_clients + ' > ul > li').length;
 			$(dialog_clients + ' > ul')[append ? 'append' : 'html'](newClientItem);
 			$clientBlock = $(dialog_clients + ' > ul > li[data-id="'+client.id+'"]');
@@ -191,32 +132,8 @@
 			$clientBlock.find('.idialog-msg').text((lastMSg.from == 'advisor' ? 'я: ' : '') + lastMSg.message);
 		}
 	}
-
-	function addMessage(data){
-		if (data.message.trim()) {
-			$.post(root + 'messenger/api/admin/', data, addMessageCallback, 'json');
-		}
-		$('#idialog-message').val('');
-	}
 	
-	function handleResponce(responce){
-		if (responce.error) {
-			console.log(responce.error);
-			return false;
-		}
-		if (responce.new_token) {
-			console.log('[' + timeleft() + '] New token: ' + responce.new_token);
-			return false;
-		}
-		if (responce.token) {
-			console.log('[' + timeleft() + '] Token: ' + responce.token);
-		}
-		
-		return true;
-	}
-	
-	
-	function getNewClientItem(clientId){
+	getNewClientItem(clientId){
 		
 		return `
 			<li class="dlg" title="Перейти к диалогу с Клиент `+clientId+`" data-id="`+clientId+`">
@@ -231,7 +148,7 @@
 		`;
 	}
 	
-	function setHistory(history){
+	setHistory(history){
 		if (!history) return;
 		let 
 			s 		= '',
@@ -248,7 +165,7 @@
 		$('#idialog-client-history ul').html(s);
 	}
 	
-	function setClientInfo(client){
+	setClientInfo(client){
 		if(!isset('history', client)) return; 
 		let 
 			date 		= new Date(),
@@ -259,26 +176,122 @@
 		$('#idialog-client-info-referer').html(client.referer);
 		$('#idialog-client-info-stats').text('На сайте ' + minOnSite + ' мин., просмотрено страниц ' + client.history.length);
 		$('#idialog-client-info-geo').text(client.geo + ', IP адрес ' + client.ip);
-		minOnSiteCounter();
+		this.minOnSiteCounter();
 	}
 	
-	function setSelectedClientInfo(client){
+	setSelectedClientInfo(client){
 		$('#idialog-messages-wrapper, #idialog-client-info').removeClass('none');
 		$('#idialog-messages').data('id', client.id).html('');
-		setHistory(client.history);
-		setClientInfo(client);
+		this.setHistory(client.history);
+		this.setClientInfo(client);
 	}
 	
-	function minOnSiteCounter(){
-		clearInterval(durationTimer);
+	minOnSiteCounter(){
+		clearInterval(this.durationTimer);
 		let $stats = $('#idialog-client-info-stats');
 		if ($stats.length) {
 			let minOnSite = +$stats.text().match(/(\d+) мин/)[1];
-			durationTimer = setInterval(function(){
+			this.durationTimer = setInterval(function(){
 				$stats.text($stats.text().replace(/(\d+) мин/, (minOnSite += 1) + ' мин'));
 			}, 60 * 1000);
 		}
 	}
+	
+	selectClient(el)
+	{
+		let 
+			clientId = $(el).data('id'),
+			data = {};
+		if (clientId == window.clientId) return;
+		window.clientId = clientId;
+		
+		if (isUndefined(this.clients[clientId]['geo'])) {
+			data.need_data = '';
+			this.needData = true;
+		} else {
+			this.needData = false;
+		}
+		this.go('?client_id=' + clientId, data);
+	}
+	
+	go(href, data = false, replace = false){
+		// let 
+			// load 			= false,
+			// toggleLoadFlag 	= false;
+			
+		// load = setTimeout(function(){
+			// toggleLoadFlag = true;
+			// toggleLoad();
+		// }, 500);
+		
+		this.transition = true;
+		
+		$.getJSON(href, data ? data : {}).always((responce) => 
+		{
+			//console.log(responce);
+			history[replace ? 'replaceState' : 'pushState'](null, null, href);
+			//clearTimeout(load);
+			// if (toggleLoadFlag && responce.statusText != 'error') toggleLoad();
+			this.listenCallback(responce);	
+			this.transition = false;
+		});
+	}
+}
+
+;(function(){
+	$(function(){
+		let advisor = new Advisor;
+		advisor.listen();
+		
+		$('#idialog-clients').on('click', 'li', function() {advisor.selectClient(this)});
+		
+		$('#idialog-send').click(() => advisor.send());
+		
+		scrollMessageBlock('#idialog-messages');
+		
+		resize();
+		var resizeListen = fnOnTimeout(resize, 300);
+		$(window).resize(function(){
+			resizeListen();
+		});
+		
+		$('#mobile-nav').click(function(){
+			$('#idialog-clients').toggleClass('open');
+		});
+		
+		$('body').click(function(e){
+			$('#dlg-history-list')[e.target.id != 'idialog-show-history' ? 'hide' : 'toggle']();
+		});
+		
+		
+		// let docFocusAction = fnOnTimeout(function(){
+			// if (titleToggleTimer) {
+				// clearInterval(titleToggleTimer);
+				// titleToggleTimer = false;
+			// }
+		// });
+		
+		// переделать. сделать иконку истории вместо стрелки и показывать при наведении, закрывать при отведении когда пройдет 1 сек
+		//$(document).on('click hover mousemove focus', docFocusAction);
+		
+	});
+	
+	function resize(){
+		var $dlgMsgWrp = $('#idialog-messages-wrapper');
+		if (!$dlgMsgWrp.length) return;
+		var wh = $(window).height();
+		$dlgMsgWrp.css('height', wh - $dlgMsgWrp.offset().top);
+	}
+	
+	// function titleToggle(){
+		// let 
+			// title = $('title').text();
+			// flag = false;
+		// titleToggleTimer = setInterval(function(){
+			// $('title').text(flag  ? title : '*** Новое сообщение');
+			// flag = !flag;
+		// }, 2000);
+	// }
 	
 	
 	// without reload
@@ -286,54 +299,4 @@
 		console.log(document.location.href);
 		go(document.location.href, false, true);
 	};
-	
-	$(function(){
-		// $('body').on('click', 'li.dlg', function(e){
-			// e.preventDefault();
-			// go($(this).attr('href'), $(this).data('request'));
-		// });
-		
-		$('#idialog-clients').on('click', 'li', function(){
-			let 
-				clientId = $(this).data('id'),
-				data = {};
-			if (clientId == window.clientId) return;
-			window.clientId = clientId;
-			
-			if (isUndefined(clients[clientId]['geo'])) {
-				data.need_data = '';
-				needData = true;
-			} else {
-				needData = false;
-			}
-			go('?client_id=' + clientId, data);
-		});
-	});
-	
-	function go(href, data = false, replace = false){
-		let 
-			load 			= false,
-			toggleLoadFlag 	= false;
-			
-		load = setTimeout(function(){
-			toggleLoadFlag = true;
-			toggleLoad();
-		}, 500);
-		
-		transition = true;
-		
-		$.get({
-			url: href, 
-			data: data ? data : {},
-			dataType: 'json'
-		}).always(function(responce){
-			//console.log(responce);
-			history[replace ? 'replaceState' : 'pushState'](null, null, href);
-			clearTimeout(load);
-			if (toggleLoadFlag && responce.statusText != 'error') toggleLoad();
-			addMessageCallback(responce);	
-			transition = false;
-		});
-		
-	}
 })();
