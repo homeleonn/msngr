@@ -1,10 +1,12 @@
 <?php
+namespace messenger\api;
+
 use messenger\{AdvisorMessenger, Listener};
 
-$advisorMessenger = new AdvisorMessenger;
-$listener = new Listener($advisorMessenger);
+$isAddMsg = isset($_POST['message']) && isset($_POST['client_id']);
+$listener = new Listener(new AdvisorMessenger(null, $isAddMsg || isset($_GET['first_connect']) ? null : \s('admin')));
 
-if (isset($_POST['message']) && isset($_POST['client_id'])) {
+if ($isAddMsg) {
 	$listener->addMessage($_POST['message'], $_POST['client_id']);
 }
 

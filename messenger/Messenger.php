@@ -7,13 +7,14 @@ class Messenger
 	protected $filename = __DIR__ . '/data.txt';
 	protected $clients;
 	
-	public function __construct($filename = false)
+	public function __construct($filename = null, $lastAccess = null)
 	{
 		//Listener::json(['error' => 1]);
-		if ($filename) {
+		if (!is_null($filename)) {
 			$this->filename = $filename;
 		}
-		$this->clients = $this->getData() ?: [];
+		
+		$this->clients = $this->getData($lastAccess) ?: [];
 	}
 	
 	public function removeClientOnId($clientId)
@@ -36,9 +37,18 @@ class Messenger
 		return !is_null(s('admin'));
 	}
 	
-	protected function getData()
+	protected function getData($lastAccess)
 	{
+		if (!file_exists($this->filename)) {
+			throw new \Exception("Datafile '{$this->filename}' not exists.");
+		}
+		
+		if ($lastAccess && $lastAccess > filemtime($this->filename)) {
+			return false;
+		}
+		
 		$data = file_get_contents($this->filename);
+		
 		return $data ? unserialize($data) : false;
 	}
 	
@@ -52,7 +62,9 @@ class Messenger
 	 */
 	public function getMessages($client, $lastAccess, $maxMessagesCount = 10): array
 	{
-		if (!isset($client['messages'])) return [];
+		if (!isset($client['messages'])){
+			return [];
+		}
 		
 		$newMessages = [];
 		foreach (array_reverse($client['messages']) as $message) {
@@ -63,6 +75,7 @@ class Messenger
 		}
 		if (isset($newMessages['messages']))
 			$newMessages['messages'] = array_reverse($newMessages['messages']);
+		
 		return $newMessages;
 	}
 	
@@ -73,7 +86,9 @@ class Messenger
 	
 	public static function getNewItems($items, $lastAccess, $maxMessagesCount = -1): array
 	{
-		if (!$items) return [];
+		if (!$items) {
+			return [];
+		}
 		$newItems = [];
 		foreach (array_reverse($items) as $item) {
 			if ($item['ts'] > $lastAccess) {
@@ -81,7 +96,10 @@ class Messenger
 				if($maxMessagesCount != -1 && !--$maxMessagesCount) break;
 			}
 		}
-		if ($newItems) $newItems = array_reverse($newItems);
+		if ($newItems){
+			$newItems = array_reverse($newItems);
+		}
+		
 		return $newItems;
 	}
 }

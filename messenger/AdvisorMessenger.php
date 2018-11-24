@@ -68,7 +68,7 @@ class AdvisorMessenger extends Messenger
 	 */
 	public function read(bool $firstAccess, ?int $clientId = null, bool $needData = false, bool $lastCircle = false,   $initTime = false): array
 	{
-		if (!$this->clients) return false;
+		if (!$this->clients) return [];
 	
 		$time 			= time();
 		$deletion 		= false;

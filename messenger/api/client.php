@@ -11,4 +11,4 @@ if (isset($_POST['message'])) {
 
 $messenger->transition();
 
-$listener->listen();
+$listener->listen(0);

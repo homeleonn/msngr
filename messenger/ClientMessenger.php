@@ -6,7 +6,7 @@ class ClientMessenger extends Messenger
 {
 	private $client;
 	
-	public function __construct($filename = false)
+	public function __construct($filename = null)
 	{
 		parent::__construct($filename);
 		$clientId = $this->generateClientId($this->clients);
@@ -29,6 +29,7 @@ class ClientMessenger extends Messenger
 		foreach ($params as $param) {
 			$$param = $_GET[$param] ?? null;
 		}
+		
 		if (empty($this->client)) {
 			$this->client = $this->setInitData($referer);
 			if (!$title) $title = $_SERVER['HTTP_REFERER'];
@@ -42,6 +43,7 @@ class ClientMessenger extends Messenger
 				'title' => $title
 			];
 		}
+		
 		$this->save(false);
 	}
 	
@@ -81,7 +83,7 @@ class ClientMessenger extends Messenger
 		return false;
 	}
 	
-	public function getNewData($firstConnect)
+	public function getNewData(bool $firstConnect)
 	{
 		$data = parent::getNewData($firstConnect);
 		return $data;
@@ -140,6 +142,7 @@ class ClientMessenger extends Messenger
 		if ($saveTime) {
 			$this->client['last_access'] = mt();
 		}
+		
 		parent::save();
 	}
 	

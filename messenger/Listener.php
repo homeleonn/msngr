@@ -78,23 +78,29 @@ class Listener
 		$firstCircle 	= true;
 		$lastCircle 	= false;
 		$time 			= time();
-		$token 			= $this->isFirstConnect ? $this->generateToken($className) : $this->checkTokensInit();
-		$listenToken 	= $this->generateListenToken();
-
-		while (time() < $time + $timeout) {
+		
+		if ($timeout) {
+			$token 			= $this->isFirstConnect ? $this->generateToken($className) : $this->checkTokensInit();
+			$listenToken 	= $this->generateListenToken();
+		}
+		
+		do {
 			if (!$firstCircle) {
 				$this->wait($step);
 				$this->messenger = new $className;
 			}
-			$lastCircle = (time() - $time) > ($timeout - $step + 1);
+			$lastCircle = !$timeout || (time() - $time) > ($timeout - $step + 1);
 			
-			$this->checkTokenLoop($token, $listenToken);
+			if ($timeout) {
+				$this->checkTokenLoop($token, $listenToken);
+			}
 			
 			if ($data = $this->messenger->getNewData($this->isFirstConnect, $lastCircle, $time)) {
 				self::json($data);
 			}
 			$firstCircle = $this->isFirstConnect = false;
-		}
+		} while(time() < $time + $timeout);
+		
 		$this->messenger->save();
 	}
 	
