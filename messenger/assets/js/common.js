@@ -98,13 +98,7 @@ class Messenger
 			return;
 		}
 		
-		this.listenInit(this.generateListenData());
-	}
-	
-	listenInit(data)
-	{
-		//console.log(this);return;
-		$.getJSON(root + 'messenger/api/' + this.type + '/', data).always((responce) => 
+		$.getJSON(root + `messenger/api/${this.type}/`, this.generateListenData()).always((responce) => 
 		{
 			if (this.listenCallback(responce)) {
 				setTimeout(() =>
@@ -115,7 +109,6 @@ class Messenger
 			}
 		});
 	}
-	
 	handleResponce(responce){
 		if (responce.error) {
 			console.log(responce.error);

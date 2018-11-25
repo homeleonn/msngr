@@ -8,7 +8,8 @@ class Advisor extends Messenger
 		this.durationTimer 		= false,
 		this.needData			= false,
 		this.titleToggleTimer	= false,
-		this.transition			= false,
+		this.isTransition		= false,
+		this.activeClientId		= window.clientId;
 		this.clients 			= {};
 	}
 	
@@ -20,34 +21,36 @@ class Advisor extends Messenger
 			data.first_connect = '';
 		}
 		
-		if (this.clientId) {
-			data.client_id = clientId;
+		if (this.activeClientId) {
+			data.client_id = this.activeClientId;
 		}
 		
 		return data;
 	}
 	
 	listenCallback(responce){
-		if (!this.handleResponce(responce)) return false;
+		if (!this.handleResponce(responce)) {
+			return false;
+		}
 			
-		if (responce.clients) {//console.log(clients);
+		if (responce.clients) {
 			for (let client in responce.clients) {
 				let 
-					selectedClient 	= window.clientId == client,
+					selectedClient 	= this.activeClientId == client,
 					clnt 			= responce.clients[client];
 				
 				clnt.id = client;
-				//console.log(clnt);
+				
 				this.updateClient(clnt, selectedClient);
 				
 				if (selectedClient) {
-					this.handleClient(window.clientId);
+					this.handleClient(this.isTransition ? this.clients[client] : clnt);
 				}
 			}
-			//console.log(clients);
-		} else if (this.transition){
-			this.handleClient(window.clientId);
+		} else {
+			this.handleClient(false);
 		}
+		
 		return true;
 	}
 	
@@ -63,12 +66,24 @@ class Advisor extends Messenger
 		this.addMessage(sendData);
 	}
 	
+	getActiveClient(){
+		return this.activeClientId ? this.clients[this.activeClientId] : false;
+	}
+	
 	
 
-	handleClient(clientId){
-		this.setSelectedClientInfo(this.clients[clientId]);
-		if(isset('messages', this.clients[clientId])) {
-			this.showMessages(this.clients[clientId].messages);
+	handleClient(client){
+		if (client === false) {
+			if (this.isTransition) {
+				client = this.getActiveClient()
+			} else {
+				return;
+			}
+		}
+		
+		this.setSelectedClientInfo(client);
+		if(isset('messages', client)) {
+			this.showMessages(client.messages);
 		}
 	}
 	
@@ -97,7 +112,6 @@ class Advisor extends Messenger
 			this.clients[client.id] = client;
 		} else {
 			for (let prop in client) {
-				//console.log(prop, client[prop], Array.isArray(client[prop]));
 				if (!isUndefined(this.clients[client.id][prop])) {
 					if (Array.isArray(client[prop])) {
 						this.clients[client.id][prop] = this.clients[client.id][prop].concat(client[prop]);
@@ -133,8 +147,8 @@ class Advisor extends Messenger
 		}
 	}
 	
-	getNewClientItem(clientId){
-		
+	getNewClientItem(clientId)
+	{
 		return `
 			<li class="dlg" title="Перейти к диалогу с Клиент `+clientId+`" data-id="`+clientId+`">
 			
@@ -155,18 +169,21 @@ class Advisor extends Messenger
 			count 	= history.length,
 			last	= history[count - 1];
 		
-		history.forEach(function(item){
+		history.reverse().forEach(function(item){
 			s += `<li><span>`+(count--)+`)`+date(item.ts)+`</span> <a href="`+item.url+`" target="_blank">`+item.title+`</a></li>`;
 		});
 		
 		$('#dlg-client-history-caption #dlg-h-time').text(date(last.ts));
 		$('#dlg-client-history-caption > a').attr({'href': last.url}).text(last.title);
-		$('#dlg-client-history-caption #dlg-h-count').text('( '+history.length+' )');
-		$('#idialog-client-history ul').html(s);
+		$('#dlg-client-history-caption #dlg-h-count').text('( '+this.getActiveClient()['history'].length+' )');
+		$('#idialog-client-history ul').prepend(s);
 	}
 	
 	setClientInfo(client){
-		if(!isset('history', client)) return; 
+		if(!isset('geo', client)) {
+			return; 
+		}
+		
 		let 
 			date 		= new Date(),
 			minOnSite 	= Math.floor((date.getTime() / 1000 - client.history[0].ts) / 60);
@@ -180,10 +197,21 @@ class Advisor extends Messenger
 	}
 	
 	setSelectedClientInfo(client){
-		$('#idialog-messages-wrapper, #idialog-client-info').removeClass('none');
-		$('#idialog-messages').data('id', client.id).html('');
-		this.setHistory(client.history);
-		this.setClientInfo(client);
+		let cl;
+		
+		if (this.isTransition || this.firstAccess) {
+			$('#idialog-messages, #idialog-client-history ul').html('');
+			$('#idialog-messages-wrapper, #idialog-client-info').removeClass('none');
+		}
+		
+		if (this.firstAccess) {
+			cl = this.getActiveClient();
+		} else {
+			cl = client;
+		}
+		
+		this.setClientInfo(cl);
+		this.setHistory(cl.history);
 	}
 	
 	minOnSiteCounter(){
@@ -202,8 +230,12 @@ class Advisor extends Messenger
 		let 
 			clientId = $(el).data('id'),
 			data = {};
-		if (clientId == window.clientId) return;
-		window.clientId = clientId;
+		
+		if (clientId == this.activeClientId) {
+			return;
+		}
+		
+		this.activeClientId = clientId;
 		
 		if (isUndefined(this.clients[clientId]['geo'])) {
 			data.need_data = '';
@@ -211,6 +243,7 @@ class Advisor extends Messenger
 		} else {
 			this.needData = false;
 		}
+		
 		this.go('?client_id=' + clientId, data);
 	}
 	
@@ -224,7 +257,7 @@ class Advisor extends Messenger
 			// toggleLoad();
 		// }, 500);
 		
-		this.transition = true;
+		this.isTransition = true;
 		
 		$.getJSON(href, data ? data : {}).always((responce) => 
 		{
@@ -233,7 +266,7 @@ class Advisor extends Messenger
 			//clearTimeout(load);
 			// if (toggleLoadFlag && responce.statusText != 'error') toggleLoad();
 			this.listenCallback(responce);	
-			this.transition = false;
+			this.isTransition = false;
 		});
 	}
 }
@@ -241,6 +274,7 @@ class Advisor extends Messenger
 ;(function(){
 	$(function(){
 		let advisor = new Advisor;
+		window.advisor = advisor;
 		advisor.listen();
 		
 		$('#idialog-clients').on('click', 'li', function() {advisor.selectClient(this)});
@@ -274,7 +308,13 @@ class Advisor extends Messenger
 		// переделать. сделать иконку истории вместо стрелки и показывать при наведении, закрывать при отведении когда пройдет 1 сек
 		//$(document).on('click hover mousemove focus', docFocusAction);
 		
+		window.onpopstate = function(event) {
+			advisor.go(document.location.href, false, true);
+		};
+		
 	});
+	
+	
 	
 	function resize(){
 		var $dlgMsgWrp = $('#idialog-messages-wrapper');
@@ -295,8 +335,5 @@ class Advisor extends Messenger
 	
 	
 	// without reload
-	window.onpopstate = function(event) {
-		console.log(document.location.href);
-		go(document.location.href, false, true);
-	};
+	
 })();

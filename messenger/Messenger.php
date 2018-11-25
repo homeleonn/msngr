@@ -84,7 +84,7 @@ class Messenger
 		return static::getNewMessages($firstAccess ? 0 : null);
 	}
 	
-	public static function getNewItems($items, $lastAccess, $maxMessagesCount = -1): array
+	public static function getNewItems($items, $lastAccess, $maxMessagesCount = 10): array
 	{
 		if (!$items) {
 			return [];

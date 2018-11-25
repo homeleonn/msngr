@@ -1,7 +1,3 @@
-
-
-
-
 ;(function(){
 	class Client extends Messenger
 	{
@@ -22,7 +18,11 @@
 		listenCallback(responce){
 			let addMessageFlagTmp 	= this.addMessageFlag;
 			this.addMessageFlag 	= false;
-			if (!this.handleResponce(responce)) return false;
+			
+			if (!this.handleResponce(responce)) {
+				return false;
+			}
+			
 			if (responce.messages) {
 				if (addMessageFlagTmp) {
 					if(responce.messages.length == 1) {
@@ -48,6 +48,7 @@
 				this.lastMsgTime = responce.messages[responce.messages.length - 1]['timestamp'];
 				scrollMessageBlock('#idialog-messages');
 			}
+			
 			return true;
 		}
 		
@@ -59,7 +60,9 @@
 		{
 			$('#idialog-message').focus();
 			var message = $('#idialog-message').val();
-			if (!message.trim()) return false;
+			if (!message.trim()) {
+				return false;
+			}
 			var data = {
 				message: message,
 				ts: 0,

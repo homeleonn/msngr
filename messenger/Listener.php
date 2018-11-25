@@ -78,6 +78,7 @@ class Listener
 		$firstCircle 	= true;
 		$lastCircle 	= false;
 		$time 			= time();
+		$prevAccess 	= !is_null(s('admin')) ? s('admin') : $time;
 		
 		if ($timeout) {
 			$token 			= $this->isFirstConnect ? $this->generateToken($className) : $this->checkTokensInit();
@@ -95,7 +96,7 @@ class Listener
 				$this->checkTokenLoop($token, $listenToken);
 			}
 			
-			if ($data = $this->messenger->getNewData($this->isFirstConnect, $lastCircle, $time)) {
+			if ($data = $this->messenger->getNewData($this->isFirstConnect, $firstCircle, $lastCircle, $prevAccess)) {
 				self::json($data);
 			}
 			$firstCircle = $this->isFirstConnect = false;

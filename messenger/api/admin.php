@@ -10,4 +10,4 @@ if ($isAddMsg) {
 	$listener->addMessage($_POST['message'], $_POST['client_id']);
 }
 
-$listener->listen();
+$listener->listen(10);
