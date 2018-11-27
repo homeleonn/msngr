@@ -25,3 +25,13 @@
 			</div>
 		</div>
 	</div>
+	<div id="idialog-init">
+		<img src="<?=uri()?>messenger/assets/img/chat-init.png">
+		<img src="<?=uri()?>messenger/assets/img/avatar.jpg" id="idialog-init-avatar">
+		<div id="idialog-init-title">Консультант сейчас онлайн.<br>Задайте интересующий Вас вопрос.</div>
+	</div>
+	
+	<div id="phone-num">
+		<input type="text" placeholder="(___) ___-__-__" value="">
+	</div>
+	

@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'send';
-  src: url('../font/send.eot?81138292');
-  src: url('../font/send.eot?81138292#iefix') format('embedded-opentype'),
-       url('../font/send.woff2?81138292') format('woff2'),
-       url('../font/send.woff?81138292') format('woff'),
-       url('../font/send.ttf?81138292') format('truetype'),
-       url('../font/send.svg?81138292#send') format('svg');
+  src: url('../font/send.eot?92321650');
+  src: url('../font/send.eot?92321650#iefix') format('embedded-opentype'),
+       url('../font/send.woff2?92321650') format('woff2'),
+       url('../font/send.woff?92321650') format('woff'),
+       url('../font/send.ttf?92321650') format('truetype'),
+       url('../font/send.svg?92321650#send') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'send';
-    src: url('../font/send.svg?81138292#send') format('svg');
+    src: url('../font/send.svg?92321650#send') format('svg');
   }
 }
 */
@@ -64,3 +64,4 @@
 .icon-paper-plane:before { content: '\f01d'; } /* '' */
 .icon-thumbs-up-alt:before { content: '\f164'; } /* '' */
 .icon-thumbs-down-alt:before { content: '\f165'; } /* '' */
+.icon-history:before { content: '\f1da'; } /* '' */

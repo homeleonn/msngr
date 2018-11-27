@@ -25,9 +25,12 @@ include __DIR__ . '/header.php';
 				<span id="dlg-h-time"></span>
 				<a href="#" target="_blank"></a> 
 				<span id="dlg-h-count"></span>
-				<button id="idialog-show-history" class="b">&#8744;</button>
 			</span>
-			<div id="dlg-history-list"><ul></ul></div>
+			<div id="dlg-history-list">
+				<button id="idialog-show-history" class="b icon-history"></button>
+				<div><ul></ul></div>
+			</div>
+			
 		</div>
 		<div id="idialog-messages" class="mt20" data-id=""></div>
 		<div id="send-block">

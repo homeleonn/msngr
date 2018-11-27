@@ -71,17 +71,92 @@
 	background: #eeeeff;
 }
 
+#phone-num{
+	position: relative;
+}
+
+#phone-num:before{
+	content: '+38';
+	top: 6px;
+	left: 5px;
+}
+
+#phone-num input{
+	padding: 5px;
+	padding-left: 30px;
+	
+}
+
+#idialog-init{
+	cursor: pointer;
+	bottom: 20px;
+	right: 20px;
+}
+
+#idialog-init-title{
+	display: none;
+	width: 210px;
+	right: 100%;
+	margin-right: 20px;
+	top: 10px;
+	background: lightgreen;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+#idialog-init-title:after{
+	content: '';
+	border: 20px transparent solid;
+	border-left: 20px lightgreen solid;
+	left: 100%;
+	top: 50%;
+	margin-top: -20px;
+	
+}
+
+#idialog-init:hover #idialog-init-title{
+	display: block;
+}
+
+
+#idialog-init:before{
+	content: '';
+	width: 15px;
+	height: 15px;
+	border-radius: 15px;
+	background: lime;
+	left: 53px;
+	top: 10px;
+	z-index: 2;
+	border: 3px #6cbcef solid;
+}
+
+#idialog-init-avatar{
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
+	left: 18px;
+	top: 10px;
+}
+
 #idialog{
 	bottom: 20px;
 	right: 20px;
 	max-width: 350px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, .5);
 	border-radius: 10px;
+	display: none;
 }
 
 #idialog,
 #idialog-close,
-#idialog-mute{
+#idialog-mute,
+#idialog-init,
+#idialog-init-avatar,
+#idialog-init:before,
+#idialog-init-title:after,
+#idialog-init-title,
+#phone-num:before{
 	position: absolute;
 }
 
@@ -494,28 +569,30 @@ li{
 	margin: 0 15px 15px;
 }
 
+#dlg-h-count{
+	margin-left: 5px;
+}
 
 #idialog-client-history{
 	margin-top: 20px;
 }
 
 #idialog-client-history,
-#idialog-client-history > #dlg-history-list{
+#idialog-client-history #dlg-history-list > div{
 	position: relative;
 }
 
-#idialog-client-history > #dlg-history-list{
+#idialog-client-history #dlg-history-list > div{
 	position: absolute;
-	display: none;
-	z-index: 9999;
 	box-shadow: 0 0 3px #000;
-	top: 30px;
+	top: 20px;
+	display: none;
+	z-index: 999;
 }
 
 #idialog-client-history ul{
 	display: inline-block;
 	background: #fafaff;
-	~padding: 10px;
 }
 
 #idialog-client-history li:not(:last-child){
@@ -540,13 +617,16 @@ li{
 #idialog-client-history ul a{
 	display: inline-block;
 	padding: 10px;
-	~min-width: 100px;
 	width: 100%;
 }
 
-#dlg-client-history-caption > button{
+#dlg-history-list > button{
 	background: transparent;
 	border: 0;
+}
+
+#dlg-history-list{
+	display: inline;
 }
 
 

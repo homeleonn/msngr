@@ -63,54 +63,44 @@ class AdvisorMessenger extends Messenger
 	 *  @param $clientId		
 	 *  @param $needDataForSelectedClient 	true if we don't know init data about client
 	 *  @param $lastCircle 					last request in pending cycle
-	 *  @param $initTime 					time of init listen cycle
+	 *  @param $initTime 					time of previous last listen cycle
 	 *  
 	 *  @return list clients with new data
 	 */
 	public function read(bool $firstAccess, ?int $clientId = null, bool $needDataForSelectedClient = false, bool $firstCircle = false, bool $lastCircle = false, $initTime = 0): array
 	{
-		if (!$this->clients) return [];
+		if (!$this->clients) {
+			return [];
+		}
 	
 		$time 			= time();
 		$deletion 		= false;
 		$lastAccess 	= $firstAccess ? 0 : s('admin');
 		$clientsOnlineResult = [];
-		//d(12);
+		
 		foreach ($this->clients as $id => $client) {
-			// if ($this->removeOldClient($id, &$deletion, $time)) continue;
-			$clientData 		= [];
-			$selectedClient 	= $clientId == $id;
-			$argsForMessages 	= [null, $firstCircle && $initTime ? $initTime: $lastAccess];
+			//if ($this->removeOldClient($id, $deletion, $time)) continue;
+			$clientData 			= [];
+			$selectedClient 		= $clientId == $id;
+			$argsForNewClientData['last_access'] = $firstAccess ? 0 : ($firstCircle && $initTime ? $initTime: $lastAccess);
 			
 			if ($selectedClient) {
 				if ($firstAccess || $needDataForSelectedClient) {
 					if ($firstAccess) {
-						$argsForMessages[1] = 0;
+						$argsForNewClientData['last_access'] = 0;
 					}
 					$clientData = $this->getMeta($id);
 				}
 			}
 			
-			if (isset($client['messages'])) {
-				$argsForMessages[0] = $client['messages'];
-				if ($messages = call_user_func_array(['parent', 'getNewItems'], $argsForMessages)) {
-					$clientData['messages'] = $messages;
-				}
-			}
+			// Get messages
+			$clientData = $this->getClientData($clientData, $client, 'messages', $argsForNewClientData);
 			
+			// Get history
 			if ($clientData || $firstAccess || $lastCircle) {
-				$argsForMessages[0] = $client['history'];
-				if ($argsForMessages[1]) {
-					// Так как я хочу отдавать историю лишь на последнем кругу слушающего цикла, и вдруг за это время произошло событие, а время последнего опроса изменилось, то берем для опроса истории время запуска первого круга слушающего цикла
-					//$argsForMessages[1] = $initTime;
-					//$argsForMessages[1] = ($initTime && ($initTime < $lastAccess) ? $initTime : $lastAccess);
-					//$argsForMessages[1] = 0;
-				}
-				if ($history = call_user_func_array(['parent', 'getNewItems'], $argsForMessages)) {
-					$clientData['history'] = $history;
-				}
+				$argsForNewClientData['last_access'] = $firstAccess ? 0 : ($initTime ? $initTime : $lastAccess);
+				$clientData = $this->getClientData($clientData, $client, 'history', $argsForNewClientData);
 			}
-			
 			
 			if ($clientData || $firstAccess) {
 				$clientsOnlineResult['clients'][$id] = (object)$clientData;
@@ -121,7 +111,30 @@ class AdvisorMessenger extends Messenger
 			parent::save();
 		}
 		s('admin', mt());
+		
 		return $clientsOnlineResult;
+	}
+	
+	private function getClientData($clientData, $client, $dataName, $args)
+	{
+		if (isset($client[$dataName])) {
+			$args['required_data'] 	= $client[$dataName];
+			if (!isset($args['last_access'])) {
+				$args['last_access'] = 0;
+			}
+			
+			if (!isset($args['max_items'])) {
+				$data = parent::getNewItems($args['required_data'], $args['last_access']);
+			} else {
+				$data = parent::getNewItems($args['required_data'], $args['last_access'], $args['max_items']);
+			}
+			
+			if ($data) {
+				$clientData[$dataName] = $data;
+			}
+		}
+		
+		return $clientData;
 	}
 	
 	private function getMeta($clientId)

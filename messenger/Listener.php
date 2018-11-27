@@ -100,7 +100,7 @@ class Listener
 				self::json($data);
 			}
 			$firstCircle = $this->isFirstConnect = false;
-		} while(time() < $time + $timeout);
+		} while (time() < $time + $timeout);
 		
 		$this->messenger->save();
 	}

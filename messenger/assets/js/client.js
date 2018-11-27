@@ -80,7 +80,11 @@
 	
 	$(function(){
 		let client = new Client;
-		client.listen();
+		//client.listen();
+		
+		$('#idialog-init, #idialog-close').click(function(){
+			$('#idialog-init, #idialog').toggle(200);
+		});
 		
 		$('#idialog-send').click(() => client.send());
 		
@@ -88,6 +92,8 @@
 			client.volumeToggle()
 			$(this).removeClass().addClass('icon-volume-'+(client.volume ? 'up' : 'off')+'-1');
 		});
+	
+		
 		
 		window.addEventListener('storage', function(e){
 			if (e.key == 'shared_msg') {
@@ -99,6 +105,86 @@
 				});
 				scrollMessageBlock('#idialog-messages');
 			}
+		});
+	});
+	
+})();
+
+// Phone mask
+;(() => {
+	$(() => {
+		var 
+			$phone = $('#phone-num input'),
+			pname = [],
+			mask = '(000) 000-00-00';
+			
+		$phone.on('keypress keyup', function(e){
+			let valid = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete'];
+			if (!(valid.indexOf(e.originalEvent.key) + 1))
+				e.preventDefault();
+		});
+		
+		$phone.keydown(function(e){
+			setTimeout(() => {
+				let 
+					value = e.originalEvent.key,
+					fullNum = '',
+					j = 0,
+					tmp,
+					selection = false;
+					
+				if (['ArrowLeft', 'ArrowRight'].indexOf(e.originalEvent.key) + 1) {
+					return;
+				}
+				
+				if (value == 'Backspace' || value == 'Delete') {
+					tmp = $phone.val().match(/\d/g);
+					pname = tmp ? tmp : [];
+					selection = $phone[0].selectionStart;
+				} else if (!isNaN(+value)) {
+					if ($phone.val()) {
+						tmp = $phone.val().substr(0, $phone[0].selectionStart).match(/\d/g);
+						if (tmp && tmp.length < pname.length) {
+							selection = $phone[0].selectionStart + 1;
+							let maskSplit = mask.split(''), maxCycles = 20;
+							while (selection <= mask.length && isNaN(maskSplit[selection]) || maskSplit[selection] == ' ') {
+								selection++;
+								if (maxCycles-- < 0) break;
+							}
+						}
+						if (!tmp && $phone[0].selectionStart != 1) {
+							pname = [value];
+						} else {
+							pname.splice(tmp ? tmp.length : 0, 0, value);
+						}
+					} else {
+						pname.push(value);
+					}
+				}
+				
+				mask.split('').forEach((s, i) => {
+					if (s == " " || isNaN(+s)){
+						fullNum += s;
+					} else {
+						if (pname[j] != undefined) {
+							fullNum += pname[j++];
+						} else {
+							if (selection === false) {
+								selection = i;
+							}
+							fullNum += '_';
+						}
+					}
+				});
+				$phone.val(fullNum);
+				if (!selection) {
+					selection = $phone.length;
+				}
+				if (selection == 1) {
+					selection++;
+				}
+				$phone[0].setSelectionRange(selection, selection);
+			}, 1);
 		});
 	});
 })();

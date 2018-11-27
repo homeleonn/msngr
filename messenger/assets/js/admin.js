@@ -57,11 +57,10 @@ class Advisor extends Messenger
 	send()
 	{
 		$('#idialog-message').focus();
-		let sendData = {message: $('#idialog-message').val()};
-		
-		if (clientId) {
-			sendData.client_id = clientId;
-		}
+		let sendData = {
+			message: 	$('#idialog-message').val(),
+			client_id: 	this.activeClientId
+		};
 		
 		this.addMessage(sendData);
 	}
@@ -108,7 +107,8 @@ class Advisor extends Messenger
 			newClient 		= isUndefined(this.clients[client.id]),
 			lastMSg;
 		
-		if (newClient || (selectedClient && this.needData)) {
+		//if (newClient || (selectedClient && this.needData)) {
+		if (newClient) {
 			this.clients[client.id] = client;
 		} else {
 			for (let prop in client) {
@@ -180,7 +180,7 @@ class Advisor extends Messenger
 	}
 	
 	setClientInfo(client){
-		if(!isset('geo', client)) {
+		if(!isset('geo', client) || !isset('history', client)) {
 			return; 
 		}
 		
@@ -199,18 +199,15 @@ class Advisor extends Messenger
 	setSelectedClientInfo(client){
 		let cl;
 		
-		if (this.isTransition || this.firstAccess) {
+		if (this.isTransition || this.firstAccess) {console.log(1);
 			$('#idialog-messages, #idialog-client-history ul').html('');
 			$('#idialog-messages-wrapper, #idialog-client-info').removeClass('none');
-		}
-		
-		if (this.firstAccess) {
 			cl = this.getActiveClient();
+			this.setClientInfo(cl);
 		} else {
 			cl = client;
 		}
-		
-		this.setClientInfo(cl);
+		console.log(cl);
 		this.setHistory(cl.history);
 	}
 	
@@ -293,9 +290,17 @@ class Advisor extends Messenger
 			$('#idialog-clients').toggleClass('open');
 		});
 		
-		$('body').click(function(e){
-			$('#dlg-history-list')[e.target.id != 'idialog-show-history' ? 'hide' : 'toggle']();
-		});
+		let hideHistoryTimer;
+		$('#dlg-history-list').hover(
+			function(e){
+				clearTimeout(hideHistoryTimer);
+				$('#dlg-history-list > div').fadeIn();
+				//$('#dlg-history-list')[e.target.id != 'idialog-show-history' ? 'hide' : 'toggle']();
+			},
+			function(e){
+				hideHistoryTimer = setTimeout(() => $('#dlg-history-list > div').fadeOut(), 500);
+			}
+		);
 		
 		
 		// let docFocusAction = fnOnTimeout(function(){

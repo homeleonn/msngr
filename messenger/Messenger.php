@@ -84,7 +84,7 @@ class Messenger
 		return static::getNewMessages($firstAccess ? 0 : null);
 	}
 	
-	public static function getNewItems($items, $lastAccess, $maxMessagesCount = 10): array
+	public static function getNewItems($items, $lastAccess, $maxItemsCount = 10): array
 	{
 		if (!$items) {
 			return [];
@@ -93,7 +93,7 @@ class Messenger
 		foreach (array_reverse($items) as $item) {
 			if ($item['ts'] > $lastAccess) {
 				$newItems[] = $item;
-				if($maxMessagesCount != -1 && !--$maxMessagesCount) break;
+				if($maxItemsCount != -1 && !--$maxItemsCount) break;
 			}
 		}
 		if ($newItems){
