@@ -85,11 +85,14 @@ class Messenger
 	{
 		this.type		 	= type;
 		this.maxContacts 	= maxContacts;
-		this.listenTimeout 	= 10000;
+		this.listenTimeout 	= 5000;
+		this.listenTimer 	= false;
 		this.lastMsgTime 	= 0;
 		this.firstAccess 	= true;
 		this.volume 		= false;
 		this.addMessageFlag	= false;
+		this.stop			= false;
+		this.token			= Math.random();
 	}
 	
 	listen()
@@ -97,18 +100,23 @@ class Messenger
 		if (this.isExpiredCountContacts()) {
 			return;
 		}
+			
+		this.checkToken();
 		
 		$.getJSON(root + `messenger/api/${this.type}/`, this.generateListenData()).always((responce) => 
 		{
 			if (this.listenCallback(responce)) {
-				setTimeout(() =>
+				this.firstAccess = false;
+				this.listenTimer = setTimeout(() =>
 				{
-					this.firstAccess = false;
-					this.listen();
+					if (!this.getStop()) {
+						this.listen();
+					}
 				}, this.listenTimeout);
 			}
 		});
 	}
+	
 	handleResponce(responce){
 		if (responce.error) {
 			console.log(responce.error);
@@ -123,6 +131,18 @@ class Messenger
 		}
 		
 		return true;
+	}
+	
+	getStop(){
+		return this.stop;
+	}
+	
+	setStop(flag){
+		if (flag === true) {
+			clearTimeout(this.listenTimer);
+		}
+		
+		this.stop = flag;
 	}
 	
 	play(){
@@ -168,7 +188,18 @@ class Messenger
 		$('#idialog-message').val('');
 	}
 }
-
+function db(value)
+	{
+		let key = 'idialog';
+		
+		if (value == undefined) {
+			return JSON.parse(localStorage.getItem(key));
+		} else if (value == 'exit'){
+			localStorage.removeItem(key);
+		} else {
+			localStorage.setItem(key, JSON.stringify(value));
+		}
+	}
 function cl(){
 	console.log(new Error().stack);
 	console.log.apply(console, arguments);return;

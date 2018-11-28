@@ -199,7 +199,7 @@ class Advisor extends Messenger
 	setSelectedClientInfo(client){
 		let cl;
 		
-		if (this.isTransition || this.firstAccess) {console.log(1);
+		if (this.isTransition || this.firstAccess) {
 			$('#idialog-messages, #idialog-client-history ul').html('');
 			$('#idialog-messages-wrapper, #idialog-client-info').removeClass('none');
 			cl = this.getActiveClient();
@@ -207,7 +207,6 @@ class Advisor extends Messenger
 		} else {
 			cl = client;
 		}
-		console.log(cl);
 		this.setHistory(cl.history);
 	}
 	
@@ -258,10 +257,7 @@ class Advisor extends Messenger
 		
 		$.getJSON(href, data ? data : {}).always((responce) => 
 		{
-			//console.log(responce);
 			history[replace ? 'replaceState' : 'pushState'](null, null, href);
-			//clearTimeout(load);
-			// if (toggleLoadFlag && responce.statusText != 'error') toggleLoad();
 			this.listenCallback(responce);	
 			this.isTransition = false;
 		});

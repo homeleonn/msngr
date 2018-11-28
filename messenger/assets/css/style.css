@@ -89,8 +89,9 @@
 
 #idialog-init{
 	cursor: pointer;
-	bottom: 20px;
-	right: 20px;
+	bottom: 2px;
+	right: 2px;
+	transform: scale(.9);
 }
 
 #idialog-init-title{
@@ -417,6 +418,10 @@
 	
 	#idialog-messages {
 		height: 200px;
+	}
+	
+	#idialog-init{
+		transform: scale(.7);
 	}
 }
 

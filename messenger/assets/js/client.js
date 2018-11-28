@@ -39,13 +39,12 @@
 				});
 				this.play();
 				
-				
 				if (this.firstAccess) {
 					sharedMsg = sharedMsg.slice(-2);
 				}
 				
 				this.storageMsg(sharedMsg);
-				this.lastMsgTime = responce.messages[responce.messages.length - 1]['timestamp'];
+				this.lastMsgTime = responce.messages[responce.messages.length - 1]['ts'];
 				scrollMessageBlock('#idialog-messages');
 			}
 			
@@ -59,11 +58,16 @@
 		send()
 		{
 			$('#idialog-message').focus();
-			var message = $('#idialog-message').val();
+			let message = $('#idialog-message').val();
 			if (!message.trim()) {
 				return false;
 			}
-			var data = {
+			
+			if (this.firstAccess) {
+				this.listen();	
+			}
+			
+			let data = {
 				message: message,
 				ts: 0,
 				from: 'client'
@@ -75,39 +79,176 @@
 			$('#idialog-message').val('');
 		}
 		
+		checkToken(){
+			let dbData = db();
+			if (!dbData) {
+				db({token: this.token});
+			} else if (dbData.token != this.token){
+				//this.token = Math.random();
+				db({token: this.token});
+				this.setStop(false);
+			}
+		}
+		
 	}
-
+	
+	function db(value)
+	{
+		let key = 'idialog';
+		
+		if (value == undefined) {
+			return JSON.parse(localStorage.getItem(key));
+		} else if (value == 'exit'){
+			localStorage.removeItem(key);
+		} else {
+			localStorage.setItem(key, JSON.stringify(value));
+		}
+	}
+	
+	function ls(key, value){
+		if (key == undefined) {
+			return false;
+		} else if (key == 'remove') {
+			localStorage.removeItem(key);
+		} else if (value == undefined){
+			return JSON.parse(localStorage.getItem(key));
+		} else {
+			localStorage.setItem(key, JSON.stringify(value));
+		}
+	}
+	
+	var selfTab;
+	class Tab
+	{
+		get()
+		{
+			let tabs = ls('tabs');
+			
+			return tabs ? tabs : [];
+		}
+		
+		set(value = null, tabs1 = false){
+			let tabs = tabs1 ? tabs1 : this.get();
+			tabs.push(value)
+			ls('tabs', tabs);
+		}
+		
+		add()
+		{
+			let tabs = this.get();
+			selfTab = tabs.length;
+			this.set();
+		}
+		
+		remove()
+		{
+			let tabs = this.get();
+			if (tabs.length){
+				tabs.splice(selfTab, 1);
+				this.set('remove', tabs);
+			}
+		}
+		
+		delegate(client){
+			let tabs = this.get(), max = 0;
+				
+			if (tabs[tabs.length - 1] != 'remove') {
+				return;
+			}
+				console.log(2);
+				
+			tabs.forEach((item, i) => {
+				if (!isNaN(item)) {
+					if (item > max) {
+						max = item;
+					}
+				}
+			});
+			console.log(max)
+			if (selfTab == max){
+				tabs.splice(tabs.length - 1, 1);
+				ls('tabs', tabs);
+				client.listen();
+			}
+		}
+	}
+	
+	function max(arr){
+		return Math.max.apply(null, arr);
+	}
+	
+	
 	
 	$(function(){
-		let client = new Client;
-		//client.listen();
+		let client;//, tab = new Tab;
 		
-		$('#idialog-init, #idialog-close').click(function(){
+		// num tab
+		//tab.add();
+		
+		function init(el){
+			if (!client) {
+				client = new Client;
+			}
+			
+			if(el) {
+				console.log(client.getStop());
+				if (el.target.id == 'idialog-close') {
+					client.setStop(true);
+					db('exit');
+				}
+				// else if (!client.getStop()) {
+					// client.setStop(false);
+					// client.listen();
+				// }
+			}
+			
 			$('#idialog-init, #idialog').toggle(200);
-		});
+		}
+		
+		$('#idialog-init, #idialog-close').click(init);
+		
+		let dbData = db();
+		if (dbData && dbData.token) {
+			init();
+			client.listen();
+		}
+		
 		
 		$('#idialog-send').click(() => client.send());
 		
 		$('#idialog-mute').click(function(){
-			client.volumeToggle()
+			client.volumeToggle();
 			$(this).removeClass().addClass('icon-volume-'+(client.volume ? 'up' : 'off')+'-1');
 		});
-	
 		
 		
-		window.addEventListener('storage', function(e){
+		
+		window.addEventListener('storage', (e) => {
+			if (client == undefined) {
+				return;
+			}
+			
 			if (e.key == 'shared_msg') {
 				var sharedMsg = localStorage.getItem('shared_msg');
-				JSON.parse(sharedMsg).forEach(function(message){
-					if (message.timestamp > lastMsgTime) {
+				JSON.parse(sharedMsg).forEach((message) => {
+					if (message.ts > client.lastMsgTime) {
+						client.lastMsgTime = message.ts;
 						client.showMessage(message.message, message.ts, message.from);
 					}
 				});
 				scrollMessageBlock('#idialog-messages');
+			} else if (e.key == 'idialog') {
+				client.setStop(true);
+			} else if (e.key == 'tabs') {
+				tab.delegate(client);
 			}
 		});
+		
+		window.addEventListener('beforeunload', () => {
+			//tab.remove();
+		});
+		
 	});
-	
 })();
 
 // Phone mask
