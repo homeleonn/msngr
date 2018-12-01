@@ -1,6 +1,6 @@
 <?php
 namespace messenger\api;
-
+if (!isDebug() && !isAdmin()) exit;
 use messenger\{AdvisorMessenger, Listener};
 
 $isAddMsg = isset($_POST['message']) && isset($_POST['client_id']);

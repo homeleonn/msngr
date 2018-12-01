@@ -1,3 +1,132 @@
+class Messenger
+{
+	constructor(type = 'client', maxContacts = 10)
+	{
+		this.type		 	= type;
+		this.maxContacts 	= maxContacts;
+		this.listenTimeout 	= 10000;
+		this.listenTimer 	= false;
+		this.lastMsgTime 	= 0;
+		this.firstAccess 	= true;
+		this.volume 		= true;
+		this.addMessageFlag	= false;
+		this.stop			= false;
+		this.token			= Math.random();
+	}
+	
+	listen(callback = false)
+	{
+		// if (this.isExpiredCountContacts()) {
+			// return;
+		// }
+			
+		try {
+			this.checkToken();
+		} catch(e){}
+		
+		
+		$.getJSON(messengerRoot + `messenger/api/${this.type}/`, this.generateListenData()).always((responce) => 
+		{
+			if (this.listenCallback(responce)) {
+				this.firstAccess = false;
+				
+				if (callback) {
+					callback()
+				}
+				console.log(2)
+				this.listenTimer = setTimeout(() =>
+				{
+					if (!this.getStop()) {
+						this.listen();
+					}
+				}, this.listenTimeout);
+			}
+		});
+	}
+	
+	handleResponce(responce){
+		if (typeof responce.error == "string") {
+			if (responce.error == 'spam') {
+				this.removeLastMessage();
+				alert('Вы отправляете сообщения слишком часто! Подождите минутку.');
+			}
+			return false;
+		}
+		if (responce.new_token) {
+			console.log('[' + timeleft() + '] New token: ' + responce.new_token);
+			return false;
+		}
+		if (responce.token) {
+			console.log('[' + timeleft() + '] Token: ' + responce.token);
+		}
+		
+		return true;
+	}
+	
+	getStop(){
+		return this.stop;
+	}
+	
+	setStop(flag){
+		if (flag === true) {
+			clearTimeout(this.listenTimer);
+		}
+		
+		this.stop = flag;
+	}
+	
+	play(){
+		if (!this.volume || this.firstAccess) return;
+		try {
+			var promise = (new Audio(messengerRoot + 'messenger/assets/audio/aay-quiet.wav')).play();
+			if (promise !== undefined) {
+			  promise.then(_ => {}).catch(error => {});
+			}
+		} catch (e) {}
+	}
+	
+	volumeToggle()
+	{
+		this.volume = !this.volume;
+	}
+	
+	isExpiredCountContacts()
+	{
+		return this.maxContacts-- <= 0 ? true : false;
+	}
+	
+	showMessage(message, ts, from){
+		let date = new Date();
+		if (ts !== 0) {
+			date.setTime(ts * 1000);
+		}
+		let time = setZero(date.getHours()) + ':' + setZero(date.getMinutes())
+		$('#idialog-messages').append(`
+			<div class="idialog-` + from + `">
+				<div class="idialog-message-content">
+					<div class="idialog-message-time">` + time + `</div>
+					` + message + `
+				</div>
+			</div>
+		`);
+	}
+	
+	addMessage(data){
+		if (data.message.trim()) {
+			$.post(messengerRoot + 'messenger/api/' + this.type + '/', data, (responce) => this.listenCallback(responce), 'json');
+		}
+		$('#idialog-message').val('');
+	}
+	
+	removeLastMessage(){
+		$('#idialog-messages > *').last().remove();
+	}
+	
+	cut(text, len = 255){
+		return text.substr(0, len);
+	}
+}
+
 
 
 function toggleLoad(){
@@ -72,133 +201,14 @@ function fnOnTimeout(callback, delay){
 function play(volume = false){
 	if (!volume) return;
 	try {
-		var promise = (new Audio(root + 'messenger/assets/audio/aay-quiet.wav')).play();
+		var promise = (new Audio(messengerRoot + 'messenger/assets/audio/aay-quiet.wav')).play();
 		if (promise !== undefined) {
 		  promise.then(_ => {}).catch(error => {});
 		}
 	} catch (e) {}
 }
 
-class Messenger
-{
-	constructor(type = 'client', maxContacts = 10)
-	{
-		this.type		 	= type;
-		this.maxContacts 	= maxContacts;
-		this.listenTimeout 	= 10000;
-		this.listenTimer 	= false;
-		this.lastMsgTime 	= 0;
-		this.firstAccess 	= true;
-		this.volume 		= true;
-		this.addMessageFlag	= false;
-		this.stop			= false;
-		this.token			= Math.random();
-	}
-	
-	listen()
-	{
-		if (this.isExpiredCountContacts()) {
-			return;
-		}
-			
-		try {
-			this.checkToken();
-		} catch(e){}
-		
-		
-		$.getJSON(root + `messenger/api/${this.type}/`, this.generateListenData()).always((responce) => 
-		{
-			if (this.listenCallback(responce)) {
-				this.firstAccess = false;
-				this.listenTimer = setTimeout(() =>
-				{
-					if (!this.getStop()) {
-						this.listen();
-					}
-				}, this.listenTimeout);
-			}
-		});
-	}
-	
-	handleResponce(responce){
-		if (responce.error) {
-			console.log(responce.error);
-			if (responce.error == 'spam') {
-				this.removeLastMessage();
-				alert('Вы отправляете сообщения слишком часто! Подождите минутку.');
-			}
-			return false;
-		}
-		if (responce.new_token) {
-			console.log('[' + timeleft() + '] New token: ' + responce.new_token);
-			return false;
-		}
-		if (responce.token) {
-			console.log('[' + timeleft() + '] Token: ' + responce.token);
-		}
-		
-		return true;
-	}
-	
-	getStop(){
-		return this.stop;
-	}
-	
-	setStop(flag){
-		if (flag === true) {
-			clearTimeout(this.listenTimer);
-		}
-		
-		this.stop = flag;
-	}
-	
-	play(){
-		if (!this.volume || this.firstAccess) return;
-		try {
-			var promise = (new Audio(root + 'messenger/assets/audio/aay-quiet.wav')).play();
-			if (promise !== undefined) {
-			  promise.then(_ => {}).catch(error => {});
-			}
-		} catch (e) {}
-	}
-	
-	volumeToggle()
-	{
-		this.volume = !this.volume;
-	}
-	
-	isExpiredCountContacts()
-	{
-		return this.maxContacts-- <= 0 ? true : false;
-	}
-	
-	showMessage(message, ts, from){
-		let date = new Date();
-		if (ts !== 0) {
-			date.setTime(ts * 1000);
-		}
-		let time = setZero(date.getHours()) + ':' + setZero(date.getMinutes())
-		$('#idialog-messages').append(`
-			<div class="idialog-` + from + `">
-				<div class="idialog-message-content">
-					<div class="idialog-message-time">` + time + `</div>
-					` + message + `
-				</div>
-			</div>
-		`);
-	}
-	
-	addMessage(data){
-		if (data.message.trim()) {
-			$.post(root + 'messenger/api/' + this.type + '/', data, (responce) => this.listenCallback(responce), 'json');
-		}
-		$('#idialog-message').val('');
-	}
-	
-	removeLastMessage(){
-		$('#idialog-messages > *').last().remove();
-	}
-}
+
 function db(value)
 	{
 		let key = 'idialog';

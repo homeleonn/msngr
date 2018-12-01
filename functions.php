@@ -113,7 +113,9 @@ function view($template = NULL, $data) {
 }
 
 function isAdmin(){
-	return !is_null(s('admin'));
+	// return !is_null(s('admin'));
+	
+	return isset($_SESSION['user']['accesslevel']) && $_SESSION['user']['accesslevel'] == 1;
 }
 
 function uri($path = ''){

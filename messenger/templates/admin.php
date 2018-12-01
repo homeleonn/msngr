@@ -1,4 +1,5 @@
 <?php
+if (!isDebug() && !isAdmin()) exit;
 use messenger\{AdvisorMessenger, Listener};
 
 if (isset($_GET['toggleState'])) {
@@ -22,7 +23,7 @@ include __DIR__ . '/header.php';
 <span id="mobile-nav"></span>
 <div id="idialog-admin">
 	<div id="idialog-clients" class="col-sm-3">
-		<div class="switch"></div>
+		<div class="switch<?=(isOn()?' on':'')?>"></div>
 		<h3>Клиенты</h3>
 		<ul></ul>
 	</div>
@@ -75,6 +76,8 @@ include __DIR__ . '/header.php';
 		</div>
 	</div>
 </div>
+<iframe src="<?=uri()?>messenger/assets/audio/silence.mp3" allow="autoplay" style="display:none" id="iframeAudio">
+</iframe> 
 <script>
 	var clientId = <?=($_GET['client_id'] ?? 'false')?>;
 	var on = <?=(isOn()?'true':'false')?>;

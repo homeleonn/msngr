@@ -25,7 +25,8 @@
 			
 			if (responce.messages) {
 				if (addMessageFlagTmp) {
-					if(responce.messages.length == 1) {
+					if(responce.messages.length == 1) { console.log(responce.messages);
+						this.lastMsgTime = responce.messages[0]['ts'];
 						this.storageMsg(responce.messages);
 						return true;
 					} else {
@@ -64,9 +65,20 @@
 			}
 			
 			if (this.firstAccess) {
-				this.listen();	
+				this.listen(() => this.sendHelper(message));	
+			} else {
+				this.sendHelper(message);
+				
+				if (this.getStop()) {
+					setTimeout(() => {
+						this.setStop(false);
+						this.listen();
+					}, this.listenTimeout);
+				}
 			}
-			
+		}
+		
+		sendHelper(message){
 			let data = {
 				message: message,
 				ts: 0,
@@ -154,7 +166,6 @@
 			if (tabs[tabs.length - 1] != 'remove') {
 				return;
 			}
-				console.log(2);
 				
 			tabs.forEach((item, i) => {
 				if (!isNaN(item)) {
@@ -190,7 +201,6 @@
 			}
 			
 			if(el) {
-				console.log(client.getStop());
 				if (el.target.id == 'idialog-close') {
 					client.setStop(true);
 					db('exit');

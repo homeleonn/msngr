@@ -170,12 +170,12 @@ class Advisor extends Messenger
 			count 	= history.length,
 			last	= history[count - 1];
 		
-		history.reverse().forEach(function(item){
-			s += `<li><span>`+(count--)+`)`+date(item.ts)+`</span> <a href="`+item.url+`" target="_blank">`+item.title+`</a></li>`;
+		history.reverse().forEach((item) => {
+			s += `<li><span>`+(count--)+`)`+date(item.ts)+`</span> <a href="`+item.url+`" title="${item.title}" target="_blank">`+this.cut(item.title, 40)+`</a></li>`;
 		});
 		
 		$('#dlg-client-history-caption #dlg-h-time').text(date(last.ts));
-		$('#dlg-client-history-caption > a').attr({'href': last.url}).text(last.title);
+		$('#dlg-client-history-caption > a').attr({'href': last.url, 'title': last.title}).text(this.cut(last.title, 40));
 		$('#dlg-client-history-caption #dlg-h-count').text('( '+this.getActiveClient()['history'].length+' )');
 		$('#idialog-client-history ul').prepend(s);
 	}
@@ -284,7 +284,7 @@ class Advisor extends Messenger
 		setTimeout(() => {
 			resize();
 			scrollMessageBlock('#idialog-messages');
-		}, 200)
+		}, 500)
 		
 		$(window).resize(function(){
 			resizeListen();

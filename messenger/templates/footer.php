@@ -2,7 +2,7 @@
 	<script src='<?=uri()?>messenger/assets/js/common.js'></script>
 	<script src='<?=uri()?>messenger/assets/js/admin.js'></script>
 	<script>
-		var root = '<?=uri()?>';
+		var messengerRoot = '<?=uri()?>';
 	</script>
 </body>
 </html>
