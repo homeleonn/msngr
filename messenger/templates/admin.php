@@ -1,5 +1,11 @@
 <?php
 use messenger\{AdvisorMessenger, Listener};
+
+if (isset($_GET['toggleState'])) {
+	toggleState();
+	exit;
+}
+
 // save selected client id
 s('selected_client_id', $_GET['client_id'] ?? null);
 if (isAjax()) {
@@ -16,6 +22,7 @@ include __DIR__ . '/header.php';
 <span id="mobile-nav"></span>
 <div id="idialog-admin">
 	<div id="idialog-clients" class="col-sm-3">
+		<div class="switch"></div>
 		<h3>Клиенты</h3>
 		<ul></ul>
 	</div>
@@ -70,6 +77,7 @@ include __DIR__ . '/header.php';
 </div>
 <script>
 	var clientId = <?=($_GET['client_id'] ?? 'false')?>;
+	var on = <?=(isOn()?'true':'false')?>;
 </script>
 <?php 
 include __DIR__ . '/footer.php'; 

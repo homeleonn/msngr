@@ -85,11 +85,11 @@ class Messenger
 	{
 		this.type		 	= type;
 		this.maxContacts 	= maxContacts;
-		this.listenTimeout 	= 5000;
+		this.listenTimeout 	= 10000;
 		this.listenTimer 	= false;
 		this.lastMsgTime 	= 0;
 		this.firstAccess 	= true;
-		this.volume 		= false;
+		this.volume 		= true;
 		this.addMessageFlag	= false;
 		this.stop			= false;
 		this.token			= Math.random();
@@ -101,7 +101,10 @@ class Messenger
 			return;
 		}
 			
-		this.checkToken();
+		try {
+			this.checkToken();
+		} catch(e){}
+		
 		
 		$.getJSON(root + `messenger/api/${this.type}/`, this.generateListenData()).always((responce) => 
 		{
@@ -120,6 +123,10 @@ class Messenger
 	handleResponce(responce){
 		if (responce.error) {
 			console.log(responce.error);
+			if (responce.error == 'spam') {
+				this.removeLastMessage();
+				alert('Вы отправляете сообщения слишком часто! Подождите минутку.');
+			}
 			return false;
 		}
 		if (responce.new_token) {
@@ -146,7 +153,7 @@ class Messenger
 	}
 	
 	play(){
-		if (!this.volume) return;
+		if (!this.volume || this.firstAccess) return;
 		try {
 			var promise = (new Audio(root + 'messenger/assets/audio/aay-quiet.wav')).play();
 			if (promise !== undefined) {
@@ -186,6 +193,10 @@ class Messenger
 			$.post(root + 'messenger/api/' + this.type + '/', data, (responce) => this.listenCallback(responce), 'json');
 		}
 		$('#idialog-message').val('');
+	}
+	
+	removeLastMessage(){
+		$('#idialog-messages > *').last().remove();
 	}
 }
 function db(value)

@@ -54,6 +54,10 @@ class ClientMessenger extends Messenger
 	 */
 	public function addMessage(string $message): void
 	{
+		if ($remain = $this->isSpam()) {
+			Listener::json(['error' => 'spam', 'wait' => $remain]);
+		}
+		
 		$clearMessage = htmlspecialchars(substr($message, 0, 1000));
 		
 		$this->client['messages'][] = [
@@ -89,12 +93,29 @@ class ClientMessenger extends Messenger
 		return $data;
 	}
 	
+	public function isSpam()
+	{
+		if (isset($this->client['messages']) && count($this->client['messages']) > 5) {
+			$timeout = $i = 0;
+			$tmp = time();
+			foreach (array_reverse($this->client['messages']) as $msg) {
+				$timeout += abs($tmp - $msg['ts']);
+				$tmp = $msg['ts'];
+				if (++$i >= 5) break;
+			}
+			
+			if ($timeout < 60) return 60 - $timeout;
+		}
+		
+		return false;
+	}
+	
 	private function setInitData($referer)
 	{
 		$mt = mt();
 		$ip = $this->ipCollect();
 		try {
-			$geo = '---';//$this->geo($ip);
+			$geo = isDebug() ? '---' : $this->geo($ip);
 			$geoString = is_array($geo) ? "{$geo['city_name']}, {$geo['region_name']}, {$geo['country_name']}" : '';
 		} catch (\Exception $e) {
 			$geoString = $e->getMessage();
@@ -157,8 +178,7 @@ class ClientMessenger extends Messenger
 	}
 	
 	private function geo($ip){
-		$apiKey = include 'geo-settings.php';
-		$url = 'https://ip-location.icu/api/v1/city/?apiKey=' . $apiKey . '&ip=' . $ip;
+		$url = 'https://ip-location.icu/api/v1/city/?apiKey=' . env('GEO_KEY') . '&ip=' . $ip;
 		$response = json_decode(file_get_contents($url), true);
 
 		if((isset($response['error']))){

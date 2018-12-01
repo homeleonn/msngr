@@ -1,6 +1,6 @@
 	<div id="idialog">
 		<button id="idialog-close" class="icon-cancel-1"></button>
-		<button id="idialog-mute" class="icon-volume-off-1"></button>
+		<button id="idialog-mute" class="icon-volume-up-1"></button>
 		<div id="idialog-header" class="idialog-p">
 			<div id="idial-avatar">
 				<!--<span class="icon-thumbs-down"></span>-->

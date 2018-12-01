@@ -31,6 +31,36 @@
 	display: none !important;
 }
 
+.up.more:before{
+	content: '';
+    position: absolute;
+    width: 100%;
+    box-shadow: 0px 0px 2px black;
+    height: 5px;
+    margin: 0;
+    background: transparent;
+	z-index: -1;
+    left: 0;
+	top: 0;
+}
+
+.down.more:before{
+	content: '';
+    position: absolute;
+    width: 100%;
+    box-shadow: 0px 0px 2px black;
+    height: 5px;
+    margin: 0;
+    background: transparent;
+    z-index: -1;
+    left: 0;
+	bottom: 0px;
+}
+
+	
+	
+
+
 /*  endcommon  */
 
 #load{
@@ -579,7 +609,11 @@ li{
 }
 
 #idialog-client-history{
-	margin-top: 20px;
+	position: relative;
+	background: #fff;
+	padding: 10px;
+	margin-left: 0;
+	border-bottom: 1px #ccc solid;
 }
 
 #idialog-client-history,
@@ -593,6 +627,10 @@ li{
 	top: 20px;
 	display: none;
 	z-index: 999;
+}
+
+#dlg-history-list:active > div{
+	display: block;
 }
 
 #idialog-client-history ul{
@@ -640,6 +678,9 @@ li{
     overflow: auto;
     overflow-x: hidden;
     padding: 0 10px;
+	margin: 0;
+	~margin-top: 20px;
+	position: relative;
 }
 
 
@@ -648,6 +689,38 @@ li{
 	position: absolute;
     width: 100%;
     bottom: 0px;
+	border-top: 1px #ccc solid;
+}
+
+.switch{
+	width: 70px;
+	height: 30px;
+	border-radius: 15px;
+	border: 2px #ccc solid;
+	padding: 2px;
+	cursor: pointer;
+	position: relative;
+}
+
+.switch.on{
+	border-color: lightgreen;
+}
+
+.switch:before{
+	content: '';
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	background: #ccc;
+	display: block;
+	position: absolute;
+	margin-left: 0px;
+	transition: .1s linear;
+}
+
+.on.switch:before{
+	margin-left: 40px;
+	background: lightgreen;
 }
 
 
@@ -704,10 +777,10 @@ li{
 	}
 	
 	#idialog-admin > div:nth-child(3) > ul{
-		padding: 0 10px 0 30%;
+		~padding: 0 10px 0 30%;
 		~padding-right: 20px;
 		margin: 0;
-		margin-left: 20px;
+		margin-left: 10px;
 	}
 	
 	#idialog-admin > div:nth-child(2){
@@ -727,6 +800,31 @@ li{
 	
 	.open{
 		left:0px !important;
+	}
+	
+	#idialog-admin #idialog-client-info{
+		border-left: 0;
+		max-height: 150px;
+		overflow: auto;
+	}
+	
+	#idialog-client-history{
+		padding: 0 0 10px 20px;
+	}
+	
+	#idialog-admin #idialog-client-info .idialog-avatar{
+		width: 50px;
+		height: 50px;
+		line-height: 50px;
+	} 
+	
+	#idialog-client-info-name {
+		margin: 0;
+		font-size: 14px;
+	}
+	
+	#idialog-admin > div:nth-child(3) > div {
+		margin-right: 10px;
 	}
 }
 

@@ -142,6 +142,7 @@ class Advisor extends Messenger
 		}
 		
 		if (!isUndefined(lastMSg)) {
+			if (lastMSg.from == 'client') this.play();
 			$clientBlock.find('.idialog-lastmsg-time').text(lastMSg.ts ? date(lastMSg.ts) : '-');
 			$clientBlock.find('.idialog-msg').text((lastMSg.from == 'advisor' ? 'я: ' : '') + lastMSg.message);
 		}
@@ -266,18 +267,25 @@ class Advisor extends Messenger
 
 ;(function(){
 	$(function(){
-		let advisor = new Advisor;
-		window.advisor = advisor;
-		advisor.listen();
+		let advisor;
+		if (on) {
+			$('.switch').addClass('on');
+			advisor = new Advisor;
+			window.advisor = advisor;
+			advisor.listen();
+		}
+		
 		
 		$('#idialog-clients').on('click', 'li', function() {advisor.selectClient(this)});
 		
 		$('#idialog-send').click(() => advisor.send());
 		
-		scrollMessageBlock('#idialog-messages');
-		
-		resize();
 		var resizeListen = fnOnTimeout(resize, 300);
+		setTimeout(() => {
+			resize();
+			scrollMessageBlock('#idialog-messages');
+		}, 200)
+		
 		$(window).resize(function(){
 			resizeListen();
 		});
@@ -286,12 +294,20 @@ class Advisor extends Messenger
 			$('#idialog-clients').toggleClass('open');
 		});
 		
+		$('.switch').click(function(){
+			$(this).toggleClass('on');
+			$.get('?toggleState', () => {
+				setTimeout(() => {
+					document.location.href = document.location.href;
+				}, 500)
+			});
+		});
+		
 		let hideHistoryTimer;
 		$('#dlg-history-list').hover(
 			function(e){
 				clearTimeout(hideHistoryTimer);
 				$('#dlg-history-list > div').fadeIn();
-				//$('#dlg-history-list')[e.target.id != 'idialog-show-history' ? 'hide' : 'toggle']();
 			},
 			function(e){
 				hideHistoryTimer = setTimeout(() => $('#dlg-history-list > div').fadeOut(), 500);

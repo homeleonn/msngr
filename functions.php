@@ -6,9 +6,60 @@ ini_set('xdebug.var_display_max_children', 256);
 ini_set('xdebug.var_display_max_data', 1024);
 ini_set('xdebug.overload_var_dump', '1');
 
-define('ROOT_URI', '/test/test/');
-define('ROOT_URL', $_SERVER['REQUEST_SCHEME'] . '://' .$_SERVER['HTTP_HOST'] . ROOT_URI);
+define('ROOT_URL', env('URL'));
+define('ROOT_URI', explode('//' . $_SERVER['HTTP_HOST'], ROOT_URL)[1]);
 define('URI', trim(str_replace([ROOT_URI, '?'.$_SERVER['QUERY_STRING']], '', $_SERVER['REQUEST_URI']), '/'));
+
+function env($key)
+{
+	static $env;
+	
+	if (!$env) {
+		$env = require_once 'config.php';
+		// $fname = ROOT . '.env';
+		// $f = file($fname);
+		// $line = 0;
+		// foreach ($f as $envString) {
+			// $envString = trim($envString);
+			// if ($envString == '') {
+				// continue;
+			// }
+			
+			// $envParts = explode('=', $envString, 2);
+			
+			// if (!isset($envParts[1])) {
+				// throw new Exception("Syntax error on enviroment file '{$fname}' on line {$line}");
+			// }
+			
+			// $env[$envParts[0]] = $envParts[1];
+			// $line++;
+		// }
+	}
+	
+	if (!isset($env[$key])) {
+		throw new Exception("Env '{$key}' is not exists!");
+	}
+	
+	return $env[$key];
+}
+
+function isDebug(){
+	return env('APP_DEBUG');
+}
+
+function isOn(){
+	$state = file(ROOT . 'on.txt')[0];
+	return is_numeric($state) && (int)$state > time() - 30 * 60;
+}
+
+function toggleState(){
+	$toggledState = isOn() ? 'off' : time();
+	file_put_contents(ROOT . 'on.txt', $toggledState);
+}
+
+function timerRefresh(){
+	file_put_contents(ROOT . 'on.txt', time());
+}
 
 function vd(){
 	$trace = debug_backtrace()[1];

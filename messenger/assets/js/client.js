@@ -29,7 +29,7 @@
 						this.storageMsg(responce.messages);
 						return true;
 					} else {
-						$('#idialog-messages > *').last().remove();
+						this.removeLastMessage();
 					}
 				}
 				var sharedMsg = [];
@@ -84,7 +84,6 @@
 			if (!dbData) {
 				db({token: this.token});
 			} else if (dbData.token != this.token){
-				//this.token = Math.random();
 				db({token: this.token});
 				this.setStop(false);
 			}
@@ -164,7 +163,7 @@
 					}
 				}
 			});
-			console.log(max)
+			
 			if (selfTab == max){
 				tabs.splice(tabs.length - 1, 1);
 				ls('tabs', tabs);

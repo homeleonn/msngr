@@ -41,7 +41,7 @@ $pages = [
 	],
 	
 	'test' => function(){
-		echo 'hello world';
+		d('hello world', isOn());
 	},
 ];
 
